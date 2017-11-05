@@ -10,6 +10,11 @@ local socket = require("socket")
 local composer = require("composer")
 local scene = composer.newScene()
 local widget = require("widget")
+local crypto = require("crypto")
+local host, port = "34.230.251.252", 40000
+local socket = require("socket")
+local tcp = assert(socket.tcp())
+local user, pass, confirm, email, phone
 
 -- "scene:create()"
 function scene:create( event )
@@ -29,7 +34,6 @@ function scene:create( event )
 		if ("began" == event.phase) then
 		elseif ("submitted" == event.phase) then
 			native.setKeyboardFocus(passField)
-			print(userField.text)
 		end
 	end
 
@@ -71,16 +75,16 @@ function scene:create( event )
 	passField = native.newTextField(display.contentCenterX, display.contentCenterY-110, 240, 30)
 	passField.inputType = "default"
 	passField:setReturnKey("next")
-	passField.placeholder = "Password"
 	passField.isSecure = true
+	passField.placeholder = "Password"
 	passField:addEventListener("userInput", onPass)
 	sceneGroup:insert(passField)
 
 	confirmField = native.newTextField(display.contentCenterX, display.contentCenterY-70, 240, 30)
 	confirmField.inputType = "default"
 	confirmField:setReturnKey("next")
-	confirmField.placeholder = "Confirm Password"
 	confirmField.isSecure = true
+	confirmField.placeholder = "Confirm Password"
 	confirmField:addEventListener("userInput", onConfirm)
 	sceneGroup:insert(confirmField)
 
@@ -99,15 +103,24 @@ function scene:create( event )
 	sceneGroup:insert(phoneField)
 
 	local function submitEvent()
-
+		user = userField.text
+		pass = crypto.digest(crypto.sha1, passField.text)
+		email = emailField.text
+		phone = phoneField.text
+		tcp:connect(host, port);
+		--tcp:send("register:"..user..":"..pass..":"..email..":"..phone);
+		tcp:send("hello world\n")
+	   	local s, status, partial = tcp:receive()
+		print(s or partial)
+		--tcp:close()
 		--transition.moveTo(sceneGroup, {x=display.contentCenterX, y=display.contentCenterY-100})
-		userField:removeSelf()
-		passField:removeSelf()
-		confirmField:removeSelf()
-		emailField:removeSelf()
-		phoneField:removeSelf()
-		composer.removeScene("register")
-		composer.gotoScene("start")
+		--userField:removeSelf()
+		--passField:removeSelf()
+		--confirmField:removeSelf()
+		--emailField:removeSelf()
+		--phoneField:removeSelf()
+		--composer.removeScene("register")
+		--composer.gotoScene("start")
 	end
 
 	local submitBtn = widget.newButton(
