@@ -4,11 +4,13 @@
 --
 -----------------------------------------------------------------------------------------
 
-display.setDefault("background", 249,250,252)
-
 local composer = require("composer")
 local scene = composer.newScene()
 local widget = require("widget")
+local physics = require("physics")
+physics.start()
+physics.setGravity(0,0)
+physics.setDrawMode("normal")
 
 -- "scene:create()"
 function scene:create( event )
@@ -17,11 +19,118 @@ function scene:create( event )
 
    	-- Initialize the scene here.
    	-- Example: add display objects to "sceneGroup", add touch listeners, etc.
-	local bg = display.newImageRect("background1.jpg", 320, 570)
-	bg.x = display.contentCenterX
-	bg.y = display.contentCenterY
+   	local paint = {
+	    type = "gradient",
+	    color1 = {115/255,3/255,192/255},
+	    color2 = {253/255,239/255,249/255},
+	    direction = "down"
+	}
+
+	local bg = display.newRect(display.contentCenterX, display.contentCenterY, 320, 570)
+	bg.fill = paint
 	bg:toBack()
-	sceneGroup:insert(bg)
+
+	------------------PHYSICS SECTION----------------------------------------------------------
+	leftWall = display.newRect(-1, display.contentCenterY, 1, 570)
+	rightWall = display.newRect(321, display.contentCenterY, 1, 570)
+	topWall = display.newRect(display.contentCenterX, -1, 320, 1)
+	bottomWall = display.newRect(display.contentCenterX, 571, 320, 1)
+	leftWall.isVisible = false
+	rightWall.isVisible = false
+	topWall.isVisible = false
+	bottomWall.isVisible = false
+
+	physics.addBody(leftWall, "static", {density = 1.0, friction = 0, bounce = 1})
+	physics.addBody(rightWall, "static", {density = 1.0, friction = 0, bounce = 1})
+	physics.addBody(topWall, "static", {density = 1.0, friction = 0, bounce = 1})
+	physics.addBody(bottomWall, "static", {density = 1.0, friction = 0, bounce = 1})
+
+	sceneGroup:insert(leftWall)
+	sceneGroup:insert(rightWall)
+	sceneGroup:insert(topWall)
+	sceneGroup:insert(bottomWall)
+
+	ball = display.newCircle(0,0,0)
+	ball:setFillColor(0,0,0)
+	newBall = display.newCircle(0,0,0)
+	newBall:setFillColor(0,0,0)
+	rnum = 0
+	r = math.random(0,255)/255
+	g = math.random(0,255)/255
+	b = math.random(0,255)/255
+	oldX = 0
+	oldY = 0
+	xForce = math.random(400, 1000)
+	yForce = math.random(400, 1000)
+
+
+	local function onCollision(event)
+
+		local function collide()
+			newBall:addEventListener("collision", onCollision)
+		end
+
+		local function changeBall()
+			rnum = math.random(2)
+
+			if (rnum == 1) then
+				newBall = display.newImageRect("start_qr.png", 100, 100)
+				newBall.x = oldX
+				newBall.y = oldY
+			else
+				newBall = display.newRect(oldX, oldY, math.random(40, 80), math.random(40, 80))
+				newBall:setFillColor(r, g, b)
+			end
+
+			physics.addBody(newBall, "dynamic", {density = 1, friction = 0, bounce = 1, isSensor = false})
+			xForce = math.random(800, 1000)
+			yForce = math.random(800, 1000)
+			newBall:applyForce(xForce, yForce)
+
+			sceneGroup:insert(newBall)
+			newBall:toBack()
+			--bg:toBack()
+			timer.performWithDelay((xForce+yForce)/20, collide)
+		end
+
+		event.target:removeEventListener("collision", onCollision)
+		if (event.other == leftWall or event.other == rightWall or event.other == topWall or event.other == bottomWall) then
+			oldX = event.target.x
+			oldY = event.target.y
+			display.remove(event.target)
+			timer.performWithDelay(0, changeBall)
+		end
+	end
+
+	local function initialBall()
+		rnum = math.random(2)
+
+		if (rnum == 1) then
+			ball = display.newImageRect("start_qr.png", 100, 100)
+			ball.x = math.random(display.contentCenterX-90, display.contentCenterX+90)
+			ball.y = math.random(display.contentCenterY-90, display.contentCenterY+90)
+			sceneGroup:insert(ball)
+		else
+			ball = display.newRect(math.random(display.contentCenterX-90, display.contentCenterX+90), math.random(display.contentCenterY-90, display.contentCenterY+90), math.random(40, 80), math.random(40, 80))
+			ball:setFillColor(r, g, b)
+			sceneGroup:insert(ball)
+		end
+
+		physics.addBody(ball, "dynamic", {density = 1, friction = 0, bounce = 1, isSensor = false})
+		ball:applyForce(math.random(800, 1000), math.random(800, 1000))
+
+		Runtime:removeEventListener("tap", initialBall)
+		ball:addEventListener("collision", onCollision)
+	end
+
+	initialBall()
+	------------------PHYSICS SECTION----------------------------------------------------------
+
+	local logo = display.newImageRect("logo_white.png", 342, 120)
+	logo.x = display.contentCenterX
+	logo.y = display.contentCenterY-120
+	logo:toFront()
+	sceneGroup:insert(logo)
 
    	local function loginEvent(event)
 		composer.gotoScene("login")
@@ -42,11 +151,16 @@ function scene:create( event )
 		fillColor = {default={1,1,1}, over={1,0,0.5}},
 	})
 	loginBtn.x = display.contentCenterX
-	loginBtn.y = display.contentCenterY - 30
+	loginBtn.y = display.contentCenterY + 40
 	sceneGroup:insert(loginBtn)
 
-	local function registerEvent()
-		composer.gotoScene("register")
+	local function registerEvent(event)
+		composer.removeScene("register1")
+		local options = {
+			effect = "slideLeft",
+			time = 800
+		}
+		composer.gotoScene("register1", options)
 	end
 
 	local registerBtn = widget.newButton(
@@ -63,7 +177,7 @@ function scene:create( event )
 		fillColor = {default={1,1,1}, over={1,0,0.5}},
 	})
 	registerBtn.x = display.contentCenterX
-	registerBtn.y = display.contentCenterY + 40
+	registerBtn.y = display.contentCenterY + 115
 	sceneGroup:insert(registerBtn)
 end
  

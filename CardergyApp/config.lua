@@ -3,21 +3,16 @@
 -- https://docs.coronalabs.com/guide/basics/configSettings
 --
 
-application =
-{
-	content =
-	{
-		width = 320,
-		height = 480, 
-		scale = "letterbox",
-		fps = 60,
-		
-		--[[
-		imageSuffix =
-		{
-			    ["@2x"] = 2,
-			    ["@4x"] = 4,
-		},
-		--]]
-	},
+local aspectRatio = display.pixelHeight / display.pixelWidth
+application = {
+   content = {
+      width = aspectRatio > 1.3 and 320 or math.ceil( 480 / aspectRatio ),
+      height = aspectRatio < 1.3 and 480 or math.ceil( 320 * aspectRatio ),
+      scale = "letterBox",
+      fps = 60,
+
+      imageSuffix = {
+         ["@2x"] = 1.3,
+      },
+   },
 }
