@@ -55,9 +55,6 @@ function scene:create( event )
 	newBall = display.newCircle(0,0,0)
 	newBall:setFillColor(0,0,0)
 	rnum = 0
-	r = math.random(0,255)/255
-	g = math.random(0,255)/255
-	b = math.random(0,255)/255
 	oldX = 0
 	oldY = 0
 	xForce = math.random(400, 1000)
@@ -71,15 +68,17 @@ function scene:create( event )
 		end
 
 		local function changeBall()
-			rnum = math.random(2)
+			--rnum = math.random(2)
 
 			if (rnum == 1) then
-				newBall = display.newImageRect("start_qr.png", 100, 100)
+				newBall = display.newImageRect("start_qr.png", 90, 90)
 				newBall.x = oldX
 				newBall.y = oldY
+				rnum = rnum + 1
 			else
-				newBall = display.newRect(oldX, oldY, math.random(40, 80), math.random(40, 80))
-				newBall:setFillColor(r, g, b)
+				newBall = display.newRoundedRect(oldX, oldY, 100, 158, 10)
+				newBall.fill = {type="image", filename="start_card.png"}
+				rnum = rnum - 1
 			end
 
 			physics.addBody(newBall, "dynamic", {density = 1, friction = 0, bounce = 1, isSensor = false})
@@ -106,13 +105,13 @@ function scene:create( event )
 		rnum = math.random(2)
 
 		if (rnum == 1) then
-			ball = display.newImageRect("start_qr.png", 100, 100)
+			ball = display.newImageRect("start_qr.png", 90, 90)
 			ball.x = math.random(display.contentCenterX-90, display.contentCenterX+90)
 			ball.y = math.random(display.contentCenterY-90, display.contentCenterY+90)
 			sceneGroup:insert(ball)
 		else
-			ball = display.newRect(math.random(display.contentCenterX-90, display.contentCenterX+90), math.random(display.contentCenterY-90, display.contentCenterY+90), math.random(40, 80), math.random(40, 80))
-			ball:setFillColor(r, g, b)
+			ball = display.newRoundedRect(math.random(display.contentCenterX-90, display.contentCenterX+90), math.random(display.contentCenterY-90, display.contentCenterY+90), 100, 158, 10)
+			ball.fill = {type="image", filename="start_card.png"}
 			sceneGroup:insert(ball)
 		end
 
@@ -128,12 +127,16 @@ function scene:create( event )
 
 	local logo = display.newImageRect("logo_white.png", 342, 120)
 	logo.x = display.contentCenterX
-	logo.y = display.contentCenterY-120
+	logo.y = display.contentCenterY-100
 	logo:toFront()
 	sceneGroup:insert(logo)
 
    	local function loginEvent(event)
-		composer.gotoScene("login")
+   		local options = {
+			effect = "slideLeft",
+			time = 800
+		}
+		composer.gotoScene("login", options)
 	end
 
 	-- create settings button for changing the time setting - Alex Indihar

@@ -17,7 +17,7 @@ local backBtn,continueBtn = nil
 local errOpts = nil
 local sceneGroup = nil
 local previous = false
-local validUser,validPass,validConfirm,validEmail,validPhone = false
+local emptyUser,emptyPass,emptyConfirm,emptyEmail,emptyPhone = false
 local userField, passField, confirmField, emailField, phoneField = nil
 
 function scene:revertAlpha(field)
@@ -48,33 +48,110 @@ function scene:create( event )
 	regTxt = display.newText("Registration", display.contentCenterX, display.contentCenterY-200, native.systemFont, 32)
 	sceneGroup:insert(regTxt)
 
-	local function continueEvent(event)
-		user = userField.text
-		pass = crypto.digest(crypto.sha1, passField.text)
-		email = emailField.text
-		phone = phoneField.text
-		regStr1 = "register:"..user..":"..pass..":"..email..":"..phone..":"
-		composer.setVariable("regStr1", regStr1)
-		
-		--transition.moveTo(sceneGroup, {x=display.contentCenterX, y=display.contentCenterY-100})
-		
-		if (previous == false) then
-			sceneGroup:remove(regTxt)
-			g:insert(regTxt)
-			sceneGroup:remove(backBtn)
-			g:insert(backBtn)
-		end
-		local options = {
-			effect = "slideLeft",
-			time = 800
+	local function changeError(f, t, s)
+		errOpts = {
+			isModal = true,
+			effect = "fade",
+			time = 400,
+			params = {
+				errTitle = t,
+				errStr = s,
+				errField = f
+			}
 		}
+	end
 
-		composer.gotoScene("register2", options)
+	local function continueEvent(event)
+		tcp:connect(host, port)
+		tcp:send("username:"..userField.text)
+   		local us, ustatus, upartial = tcp:receive()
+   		tcp:close()
+   		tcp:connect(host, port)
+		tcp:send("email:"..emailField.text)
+   		local es, estatus, epartial = tcp:receive()
+   		tcp:close()
+   		tcp:connect(host, port)
+		tcp:send("phone:"..phoneField.text)
+   		local ps, pstatus, ppartial = tcp:receive()
+   		tcp:close()
+   		
+   		if (us == "user_taken") then
+			changeError(userField, "ERROR", "Username has already been taken.")
+			composer.showOverlay("error", errOpts)
+		elseif (string.find(userField.text,"^[^%a]") ~= nil) then
+			--sceneGroup.alpha = 0.5
+			changeError(userField, "ERROR", "Username must start with an uppercase or lowercase letter.")
+			composer.showOverlay("error", errOpts)
+		elseif (string.find(userField.text,"[^%w%._]") ~= nil) then
+			--sceneGroup.alpha = 0.5
+			changeError(userField, "ERROR", "Username can only be alphanumeric and have .'s, and _'s.")
+			composer.showOverlay("error", errOpts)
+		elseif (string.len(userField.text) < 6 or string.len(userField.text) > 25) then
+			--sceneGroup.alpha = 0.5
+			changeError(userField, "ERROR", "Username must be 6 to 25 characters in length.")
+			composer.showOverlay("error", errOpts)
+		elseif (string.len(passField.text) < 8 or string.len(passField.text) > 32) then
+			--sceneGroup.alpha = 0.5
+			changeError(passField, "ERROR", "Password must be 8 to 32 characters in length.")
+			composer.showOverlay("error", errOpts)	
+		elseif (confirmField.text ~= passField.text) then
+			--sceneGroup.alpha = 0.5
+			changeError(confirmField, "ERROR", "Passwords do not match.")
+			composer.showOverlay("error", errOpts)
+		elseif (es == "email_taken") then
+			changeError(emailField, "ERROR", "Email has already been taken.")
+			composer.showOverlay("error", errOpts)
+		elseif (not(string.match(emailField.text, "^[%w%.%%%+%-_]+@[%w%.%%%+%-_]+%.[%w]+$"))) then
+			--sceneGroup.alpha = 0.5
+			changeError(emailField, "ERROR", "Invalid email.")
+			composer.showOverlay("error", errOpts)
+		elseif(string.len(emailField.text) > 50) then
+			--sceneGroup.alpha = 0.5
+			changeError(emailField, "ERROR", "Email cannot exceed 50 characters in length.")
+			composer.showOverlay("error", errOpts)
+		elseif (ps == "phone_taken") then
+			changeError(phoneField, "ERROR", "Phone number has already been taken.")
+			composer.showOverlay("error", errOpts)
+		elseif (not(string.find(phoneField.text, "[%d]"))) then
+			--sceneGroup.alpha = 0.5
+			changeError(phoneField, "ERROR", "Invalid phone number.")
+			composer.showOverlay("error", errOpts)
+		elseif (string.len(phoneField.text) ~= 10) then
+			--sceneGroup.alpha = 0.5
+			changeError(phoneField, "ERROR", "Phone number must be exactly 10 digits in length.")
+			composer.showOverlay("error", errOpts)
+		else
+			user = userField.text
+			pass = crypto.digest(crypto.sha1, passField.text)
+			email = emailField.text
+			phone = phoneField.text
+			regStr1 = "register:"..user..":"..pass..":"..email..":"..phone..":"
+			composer.setVariable("regStr1", regStr1)
+			
+			--transition.moveTo(sceneGroup, {x=display.contentCenterX, y=display.contentCenterY-100})
+			
+			if (previous == false) then
+				sceneGroup:remove(regTxt)
+				g:insert(regTxt)
+				sceneGroup:remove(backBtn)
+				g:insert(backBtn)
+			end
+
+			composer.setVariable("regTxt", regTxt)
+			composer.setVariable("backBtn", backBtn)
+
+			local options = {
+				effect = "slideLeft",
+				time = 800
+			}
+
+			composer.gotoScene("register2", options)
+		end
 	end
 
 	local function validateInput()
 		display.remove(continueBtn)
-		if (validUser == true and validPass == true and validConfirm == true and validEmail == true and validPhone == true) then
+		if (emptyUser == true and emptyPass == true and emptyConfirm == true and emptyEmail == true and emptyPhone == true) then
 			continueBtn = widget.newButton(
 			{
 				label = "Continue",
@@ -114,49 +191,28 @@ function scene:create( event )
 		end
 	end
 
-	local function changeError(f, t, s)
-		errOpts = {
-			isModal = true,
-			effect = "fade",
-			time = 400,
-			params = {
-				errTitle = t,
-				errStr = s,
-				errField = f
-			}
-		}
-	end
-
 	local function onUser(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
-			validUser = false
+			emptyUser = false
 			validateInput()
 		elseif ("submitted" == event.phase) then
-			tcp:connect(host, port)
-			tcp:send("username:"..userField.text)
-	   		local s, status, partial = tcp:receive()
-	   		tcp:close()
-
-	   		if (s == "user_taken") then
-				changeError(userField, "ERROR", "Username has already been taken.")
-				composer.showOverlay("error", errOpts)
-			elseif (string.find(userField.text,"^[^%a]") ~= nil) then
-				--sceneGroup.alpha = 0.5
-				changeError(userField, "ERROR", "Username must start with an uppercase or lowercase letter.")
-				composer.showOverlay("error", errOpts)
-			elseif (string.find(userField.text,"[^%w%._]") ~= nil) then
-				--sceneGroup.alpha = 0.5
-				changeError(userField, "ERROR", "Username can only be alphanumeric and have .'s, and _'s.")
-				composer.showOverlay("error", errOpts)
-			elseif (string.len(userField.text) < 6 or string.len(userField.text) > 25) then
-				--sceneGroup.alpha = 0.5
-				changeError(userField, "ERROR", "Username must be 6 to 25 characters in length.")
-				composer.showOverlay("error", errOpts)
-			else
-				validUser = true
+	   		if (userField.text ~= "") then
+				emptyUser = true
 				validateInput()
-				native.setKeyboardFocus(passField)
+			else
+				emptyUser = false
+				validateInput()
+			end
+
+			native.setKeyboardFocus(passField)
+		elseif ("ended" == event.phase) then
+	   		if (userField.text ~= "") then
+				emptyUser = true
+				validateInput()
+			else
+				emptyUser = false
+				validateInput()
 			end
 		end
 	end
@@ -164,17 +220,25 @@ function scene:create( event )
 	local function onPass(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
-			validPass = false
+			emptyPass = false
 			validateInput()
 		elseif ("submitted" == event.phase) then
-			if (string.len(passField.text) < 8 or string.len(passField.text) > 32) then
-				--sceneGroup.alpha = 0.5
-				changeError(passField, "ERROR", "Password must be 8 to 32 characters in length.")
-				composer.showOverlay("error", errOpts)
-			else
-				validPass = true
+			if (passField.text ~= "") then
+				emptyPass = true
 				validateInput()
-				native.setKeyboardFocus(confirmField)
+			else
+				emptyPass = false
+				validateInput()
+			end
+
+			native.setKeyboardFocus(confirmField)
+		elseif ("ended" == event.phase) then
+			if (passField.text ~= "") then
+				emptyPass = true
+				validateInput()
+			else
+				emptyPass = false
+				validateInput()
 			end
 		end
 	end
@@ -182,17 +246,25 @@ function scene:create( event )
 	local function onConfirm(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
-			validConfirm = false
+			emptyConfirm = false
 			validateInput()
 		elseif ("submitted" == event.phase) then
-			if (confirmField.text ~= passField.text) then
-				--sceneGroup.alpha = 0.5
-				changeError(confirmField, "ERROR", "Passwords do not match.")
-				composer.showOverlay("error", errOpts)
-			else
-				validConfirm = true
+			if (confirmField.text ~= "") then
+				emptyConfirm = true
 				validateInput()
-				native.setKeyboardFocus(emailField)
+			else
+				emptyConfirm = false
+				validateInput()
+			end
+
+			native.setKeyboardFocus(emailField)
+		elseif ("ended" == event.phase) then
+			if (confirmField.text ~= "") then
+				emptyConfirm = true
+				validateInput()
+			else
+				emptyConfirm = false
+				validateInput()
 			end
 		end
 	end
@@ -200,29 +272,25 @@ function scene:create( event )
 	local function onEmail(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
-			validEmail = false
+			emptyEmail = false
 			validateInput()
 		elseif ("submitted" == event.phase) then
-			tcp:connect(host, port)
-			tcp:send("email:"..emailField.text)
-	   		local s, status, partial = tcp:receive()
-	   		tcp:close()
-
-	   		if (s == "email_taken") then
-				changeError(emailField, "ERROR", "Email has already been taken.")
-				composer.showOverlay("error", errOpts)
-			elseif (not(string.match(emailField.text, "^[%w%.%%%+%-_]+@[%w%.%%%+%-_]+%.[%w]+$"))) then
-				--sceneGroup.alpha = 0.5
-				changeError(emailField, "ERROR", "Invalid email.")
-				composer.showOverlay("error", errOpts)
-			elseif(string.len(emailField.text) > 50) then
-				--sceneGroup.alpha = 0.5
-				changeError(emailField, "ERROR", "Email cannot exceed 50 characters in length.")
-				composer.showOverlay("error", errOpts)
-			else
-				validEmail = true
+	   		if (emailField.text ~= "") then
+				emptyEmail = true
 				validateInput()
-				native.setKeyboardFocus(phoneField)
+			else
+				emptyEmail = false
+				validateInput()
+			end
+
+			native.setKeyboardFocus(phoneField)
+		elseif ("ended" == event.phase) then
+	   		if (emailField.text ~= "") then
+				emptyEmail = true
+				validateInput()
+			else
+				emptyEmail = false
+				validateInput()
 			end
 		end
 	end
@@ -230,29 +298,25 @@ function scene:create( event )
 	local function onPhone(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
-			validPhone = false
+			emptyPhone = false
 			validateInput()
 		elseif ("submitted" == event.phase) then
-			tcp:connect(host, port)
-			tcp:send("phone:"..phoneField.text)
-	   		local s, status, partial = tcp:receive()
-	   		tcp:close()
-
-	   		if (s == "phone_taken") then
-				changeError(emailField, "ERROR", "Phone number has already been taken.")
-				composer.showOverlay("error", errOpts)
-			elseif (string.find(phoneField.text, "[^%d]") ~= nil) then
-				--sceneGroup.alpha = 0.5
-				changeError(phoneField, "ERROR", "Invalid phone number.")
-				composer.showOverlay("error", errOpts)
-			elseif (string.len(phoneField.text) ~= 10) then
-				--sceneGroup.alpha = 0.5
-				changeError(phoneField, "ERROR", "Phone number must be exactly 10 digits in length.")
-				composer.showOverlay("error", errOpts)
-			else
-				validPhone = true
+	   		if (phoneField.text ~= "") then
+				emptyPhone = true
 				validateInput()
-				native.setKeyboardFocus(nil)
+			else
+				emptyPhone = false
+				validateInput()
+			end
+
+			native.setKeyboardFocus(nil)
+		elseif ("ended" == event.phase) then
+			if (phoneField.text ~= "") then
+				emptyPhone = true
+				validateInput()
+			else
+				emptyPhone = false
+				validateInput()
 			end
 		end
 	end
@@ -349,7 +413,6 @@ function scene:create( event )
 	sceneGroup:insert(backBtn)
 
 	local function removeKeyboard()
-		-- add code to validate fields here too
 		native.setKeyboardFocus(nil)
 	end
 
