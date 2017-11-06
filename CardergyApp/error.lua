@@ -33,6 +33,10 @@ function scene:show( event )
       local function onComplete(event)
       	parent:revertAlpha(params.errField)
       	if (params.errTitle == "SUCCESS") then
+      		regTxt = composer.getVariable("regTxt")
+      		backBtn = composer.getVariable("backBtn")
+      		display.remove(regTxt)
+      		display.remove(backBtn)
       		local options = {
       			effect = "slideRight",
       			time = 800

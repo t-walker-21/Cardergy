@@ -73,7 +73,7 @@ function scene:create( event )
 			changeError(nil, "ERROR", "Database problem. Try again later.")
 			composer.showOverlay("error", errOpts)
 		else
-			changeError(nil, "SUCCESS", "Address cannot exceed 64 characters in length.")
+			changeError(nil, "SUCCESS", "Registration successful.")
 			composer.showOverlay("error", errOpts)
 		end
 		

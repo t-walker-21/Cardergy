@@ -64,6 +64,10 @@ function scene:create( event )
 			sceneGroup:remove(backBtn)
 			g:insert(backBtn)
 		end
+
+		composer.setVariable("regTxt", regTxt)
+		composer.setVariable("backBtn", backBtn)
+		
 		local options = {
 			effect = "slideLeft",
 			time = 800
