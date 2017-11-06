@@ -80,6 +80,7 @@ function scene:create( event )
 			composer.showOverlay("error", errOpts)
    		else
    			composer.setVariable("pass", "logScene")
+   			composer.setVariable("user", user)
    			changeError(nil, "SUCCESS", "Login successful.")
 			composer.showOverlay("error", errOpts)
 		end

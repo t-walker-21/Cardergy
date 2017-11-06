@@ -28,10 +28,17 @@ function scene:create( event )
 
 	homeTxt = display.newText("Cardergy", display.contentCenterX, display.contentCenterY-90, native.systemFont, 70)
 	soonTxt = display.newText("COMING SOON!", display.contentCenterX, display.contentCenterY-20, native.systemFont, 35)
+
+	user = composer.getVariable("user")
+	loginTxt = display.newText("Logged in as: "..user, display.contentCenterX, display.contentCenterY-20, native.systemFont, 16)
+	loginTxt.anchorX = 0
+	loginTxt.anchorY = 0
+	loginTxt.x = 10
+	loginTxt.y = 20
 	sceneGroup:insert(homeTxt)
 	sceneGroup:insert(soonTxt)
 
-	local function backEvent(event)
+	local function logoutEvent(event)
 		local options = {
 			effect = "slideRight",
 			time = 800
@@ -39,22 +46,22 @@ function scene:create( event )
 		composer.gotoScene("start", options)
 	end
 
-	backBtn = widget.newButton(
+	logoutBtn = widget.newButton(
 	{
-		label = "Back",
+		label = "Logout",
 		fontSize = 20,
 		font = native.systemFontBold,
 		emboss = true,
-		onRelease = backEvent,
+		onRelease = logoutEvent,
 		shape = "roundedRect",
 		width = 220,
 		height = 60,
 		cornerRadius = 30,
 		fillColor = {default={1,1,1}, over={1,0,0.5}},
 	})
-	backBtn.x = display.contentCenterX
-	backBtn.y = display.contentCenterY + 80
-	sceneGroup:insert(backBtn)
+	logoutBtn.x = display.contentCenterX
+	logoutBtn.y = display.contentCenterY + 80
+	sceneGroup:insert(logoutBtn)
 
 end
  
