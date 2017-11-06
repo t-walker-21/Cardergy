@@ -12,51 +12,60 @@ local widget = require("widget")
 function scene:create( event )
  
    	local sceneGroup = self.view
-   	local g = display.newGroup()
 
    	-- Initialize the scene here.
    	-- Example: add display objects to "sceneGroup", add touch listeners, etc.
+   	local paint = {
+	    type = "gradient",
+	    color1 = {115/255,3/255,192/255},
+	    color2 = {253/255,239/255,249/255},
+	    direction = "down"
+	}
+
+	local bg = display.newRect(display.contentCenterX, display.contentCenterY, 320, 570)
+	bg.fill = paint
+	bg:toBack()
+
+	homeTxt = display.newText("Cardergy", display.contentCenterX, display.contentCenterY-90, native.systemFont, 70)
+	soonTxt = display.newText("COMING SOON!", display.contentCenterX, display.contentCenterY-20, native.systemFont, 35)
+	sceneGroup:insert(homeTxt)
+	sceneGroup:insert(soonTxt)
+
+	local function backEvent(event)
+		local options = {
+			effect = "slideRight",
+			time = 800
+		}
+		composer.gotoScene("start", options)
+	end
+
+	backBtn = widget.newButton(
+	{
+		label = "Back",
+		fontSize = 20,
+		font = native.systemFontBold,
+		emboss = true,
+		onRelease = backEvent,
+		shape = "roundedRect",
+		width = 220,
+		height = 60,
+		cornerRadius = 30,
+		fillColor = {default={1,1,1}, over={1,0,0.5}},
+	})
+	backBtn.x = display.contentCenterX
+	backBtn.y = display.contentCenterY + 80
+	sceneGroup:insert(backBtn)
+
 end
-	
+ 
 -- "scene:show()"
 function scene:show( event )
  
    local sceneGroup = self.view
    local phase = event.phase
- 	
-
+ 
    if ( phase == "will" ) then
       -- Called when the scene is still off screen (but is about to come on screen).
-      parent = event.parent
-      params = event.params
-
-      local function onComplete(event)
-      	parent:revertAlpha(params.errField)
-      	pass = composer.getVariable("pass")
-      	if (pass == "regScene") then
-      		composer.setVariable("pass", nil)
-      		regTxt = composer.getVariable("regTxt")
-      		backBtn = composer.getVariable("backBtn")
-      		display.remove(regTxt)
-      		display.remove(backBtn)
-      		local options = {
-      			effect = "slideRight",
-      			time = 800
-      		}
-      		composer.gotoScene("start", options)
-      	elseif (pass == "logScene") then
-      		local options = {
-      			effect = "slideLeft",
-      			time = 800
-      		}
-      		composer.gotoScene("home", options)
-      	else
-	      	currScene = composer.getSceneName("current")
-	      	composer.gotoScene(currScene)
-	     end
-      end
-
-      local alert = native.showAlert(params.errTitle, params.errStr, {"OK"}, onComplete)
    elseif ( phase == "did" ) then
       -- Called when the scene is now on screen.
       -- Insert code here to make the scene come alive.
