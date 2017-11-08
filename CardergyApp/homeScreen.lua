@@ -83,9 +83,9 @@ function scene:create( event )
     rowTitle.y = rowHeight * 0.5
 
     --Add row image to cells
-    local rowImage = display.newImage(row,cardCategories[row.index]..)
+    local rowImage = display.newImage(row,"start_card_resized.png",4,4)
     rowImage.x = 55
-    rowImage.y = row.contentHeight/2
+    rowImage.y = rowHeight/2
 end
  
 -- Create the widget
