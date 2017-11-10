@@ -72,14 +72,14 @@ function scene:create( event )
    		local s, status, partial = tcp:receive()
    		tcp:close()
 
-   		if (s == "login_incorrect") then
+   		if (s == "login_incorrect" or partial == "login_incorrect") then
    			changeError(nil, "ERROR", "Username or password was incorrect.")
    			composer.showOverlay("error", errOpts)
-   		elseif (s == "login_fail") then
+   		elseif (s == "login_fail" or partial == "login_fail") then
    			changeError(nil, "ERROR", "Database problem. Try again later.")
 			composer.showOverlay("error", errOpts)
    		else
-   			composer.setVariable("pass", "logScene")
+   			composer.setVariable("passScene", "logScene")
    			composer.setVariable("user", user)
    			changeError(nil, "SUCCESS", "Login successful.")
 			composer.showOverlay("error", errOpts)
@@ -277,6 +277,7 @@ function scene:hide( event )
       -- Example: stop timers, stop animation, stop audio, etc.
    elseif ( phase == "did" ) then
       -- Called immediately after scene goes off screen.
+      composer.setVariable("passScene", "")
    end
 end
  

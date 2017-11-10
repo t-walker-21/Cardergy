@@ -13,6 +13,7 @@ local tcp = assert(socket.tcp())
 local crypto = require("crypto")
 local user, pass, confirm, email, phone
 local regStr1 = ""
+local takenStr = ""
 local backBtn,continueBtn = nil
 local errOpts = nil
 local sceneGroup = nil
@@ -62,20 +63,13 @@ function scene:create( event )
 	end
 
 	local function continueEvent(event)
-		tcp:connect(host, port)
-		tcp:send("username:"..userField.text)
-   		local us, ustatus, upartial = tcp:receive()
-   		tcp:close()
+   		takenStr = "taken:"..userField.text..":"..emailField.text..":"..phoneField.text
    		tcp:connect(host, port)
-		tcp:send("email:"..emailField.text)
-   		local es, estatus, epartial = tcp:receive()
-   		tcp:close()
-   		tcp:connect(host, port)
-		tcp:send("phone:"..phoneField.text)
-   		local ps, pstatus, ppartial = tcp:receive()
+		tcp:send(takenStr)
+   		local s, status, partial = tcp:receive()
    		tcp:close()
    		
-   		if (us == "user_taken") then
+   		if (s == "user_taken" or partial == "user_taken") then
 			changeError(userField, "ERROR", "Username has already been taken.")
 			composer.showOverlay("error", errOpts)
 		elseif (string.find(userField.text,"^[^%a]") ~= nil) then
@@ -98,7 +92,7 @@ function scene:create( event )
 			--sceneGroup.alpha = 0.5
 			changeError(confirmField, "ERROR", "Passwords do not match.")
 			composer.showOverlay("error", errOpts)
-		elseif (es == "email_taken") then
+		elseif (s == "email_taken" or partial == "email_taken") then
 			changeError(emailField, "ERROR", "Email has already been taken.")
 			composer.showOverlay("error", errOpts)
 		elseif (not(string.match(emailField.text, "^[%w%.%%%+%-_]+@[%w%.%%%+%-_]+%.[%w]+$"))) then
@@ -109,7 +103,7 @@ function scene:create( event )
 			--sceneGroup.alpha = 0.5
 			changeError(emailField, "ERROR", "Email cannot exceed 50 characters in length.")
 			composer.showOverlay("error", errOpts)
-		elseif (ps == "phone_taken") then
+		elseif (s == "phone_taken" or partial == "phone_taken") then
 			changeError(phoneField, "ERROR", "Phone number has already been taken.")
 			composer.showOverlay("error", errOpts)
 		elseif (not(string.find(phoneField.text, "[%d]"))) then
@@ -445,6 +439,7 @@ function scene:hide( event )
       -- Called when the scene is on screen (but is about to go off screen).
       -- Insert code here to "pause" the scene.
       -- Example: stop timers, stop animation, stop audio, etc.
+      composer.setVariable("passScene", "")
    elseif ( phase == "did" ) then
       -- Called immediately after scene goes off screen.
    end
