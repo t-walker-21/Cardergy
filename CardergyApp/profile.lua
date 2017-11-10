@@ -200,7 +200,7 @@ function scene:create( event )
       width = 355,
       onRowRender = onRowRender,
       onRowTouch = onRowTouch,
-      --isLocked = true,
+      isLocked = true,
       listener = scrollListener
    })
    tableView.x = display.contentCenterX
