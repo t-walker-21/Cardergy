@@ -113,15 +113,16 @@ end
 -- Create the widget
 local tableView = widget.newTableView(
     {
-        left = 0,
-        top = 150,
         height = 330,
-        width = 320,
+        width = 355,
         onRowRender = onRowRender,
         onRowTouch = onRowTouch,
         --listener = scrollListener
     }
 )
+
+  tableView.x = display.contentCenterX
+  tableView.y = display.contentCenterY + 25
  
 -- Insert 40 rows
 for i = 1, table.getn(cardCategories) do
