@@ -1,6 +1,6 @@
 local function onComplete( event )
    local photo = event.target
-   password = "tevon"
+   password = "password"
 
 local ftp = require("socket.ftp") -- ftp socket namespace
 
@@ -11,7 +11,7 @@ file, errorString = io.open(path,"r") -- open file for reading with path
 
 local contents = file:read("*a") -- read contents of file into contents
 
-f,e = ftp.put("ftp://tjw0018:".. password .."@198.54.112.233/home/tjw0018/video/somePhoto.jpg;type=i",contents) --login to ftp server and upload file at given directory using binary mode (not ascii)
+f,e = ftp.put("ftp://username:".. password .."@host/path/somePhoto.jpg;type=i",contents) --login to ftp server and upload file at given directory using binary mode (not ascii)
 
 --file:close() --close file pointer
 
