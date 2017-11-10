@@ -121,11 +121,11 @@ function scene:create( event )
 		   	local s, status, partial = tcp:receive()
 		   	tcp:close()
 
-			if (s == "register_fail") then
+			if (s == "register_fail" or partial == "register_fail") then
 				changeError(nil, "ERROR", "Database problem. Try again later.")
 				composer.showOverlay("error", errOpts)
 			else
-				composer.setVariable("pass", "regScene")
+				composer.setVariable("passScene", "regScene")
 				changeError(nil, "SUCCESS", "Registration successful.")
 				composer.showOverlay("error", errOpts)
 			end
@@ -397,6 +397,7 @@ function scene:hide( event )
       -- Example: stop timers, stop animation, stop audio, etc.
    elseif ( phase == "did" ) then
       -- Called immediately after scene goes off screen.
+      composer.setVariable("passScene", "")
    end
 end
  
