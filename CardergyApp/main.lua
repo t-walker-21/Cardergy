@@ -6,4 +6,4 @@
 
 local composer = require("composer")
 local scene = composer.newScene()
-composer.gotoScene("register")
+composer.gotoScene("cameraScreen")
