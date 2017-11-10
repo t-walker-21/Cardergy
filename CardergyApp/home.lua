@@ -79,6 +79,79 @@ function scene:create( event )
    topbarContainer.y = 50
 
    sceneGroup:insert(topbarContainer)
+
+cardCategories = {"Holiday","Blessings","Birthday","Congradulations!","Invite"}
+
+  local function onRowTouch(event)
+    print("you touched a cell")
+  end
+
+
+  local function onRowRender( event )
+ 
+    -- Get reference to the row group
+    local row = event.row
+ 
+    -- Cache the row "contentWidth" and "contentHeight" because the row bounds can change as children objects are added
+    local rowHeight = row.contentHeight
+    local rowWidth = 320 --row.contentWidth
+ 
+    local rowTitle = display.newText( row,cardCategories[row.index], 0, 0, nil, 14 )
+    rowTitle:setFillColor( 0 )
+ 
+    -- Align the label left and vertically centered
+    rowTitle.anchorX = 0
+    rowTitle.x = 100
+    rowTitle.y = rowHeight * 0.5
+
+    --Add row image to cells
+    local rowImage = display.newImage(row,"start_card_resized.png",4,4)
+    rowImage.x = 55
+    rowImage.y = rowHeight/2
+end
+ 
+-- Create the widget
+local tableView = widget.newTableView(
+    {
+        left = 0,
+        top = 150,
+        height = 330,
+        width = 320,
+        onRowRender = onRowRender,
+        onRowTouch = onRowTouch,
+        --listener = scrollListener
+    }
+)
+ 
+-- Insert 40 rows
+for i = 1, table.getn(cardCategories) do
+ 
+    local isCategory = false
+    local rowHeight = 36
+    local rowColor = { default={1,1,1}, over={1,0.5,0,0.2} }
+    local lineColor = { 0.5, 0.5, 0.5 }
+ 
+    -- Make some rows categories
+    --[[if ( i == 1 or i == 21 ) then
+        isCategory = true
+        rowHeight = 40
+        rowColor = { default={0.8,0.8,0.8,0.8} }
+        lineColor = { 1, 0, 0 }
+    end]]--
+ 
+    -- Insert a row into the tableView
+    tableView:insertRow(
+        {
+            isCategory = isCategory,
+            rowHeight = rowHeight,
+            rowColor = rowColor,
+            lineColor = lineColor
+        }
+    )
+end
+
+
+
 end
  
 -- "scene:show()"
