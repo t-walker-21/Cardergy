@@ -47,8 +47,11 @@ function scene:create( event )
    topbarContainer:insert(topbarInsignia)
 
    local function cameraEvent(event)
-
-      composer.gotoScene("qrScanner")
+      local options = {
+         effect = "slideLeft",
+         time = 800
+      }
+      composer.gotoScene("qrScanner", options)
 
    end
 
