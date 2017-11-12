@@ -116,7 +116,8 @@ function scene:create( event )
          }
       }
    end
-
+   
+   ------------OOP-----------------------
    string.split = function(str, pattern)
       pattern = pattern or "[^%s]+"
       if pattern:len() == 0 then
@@ -129,6 +130,7 @@ function scene:create( event )
       parts.__index = nil
       return parts
    end
+   ------------OOP-----------------------
 
    getProfile = "getProfile:"..user
    tcp:connect(host, port)
