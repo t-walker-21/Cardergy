@@ -6,8 +6,8 @@ local ftp = require("socket.ftp") -- ftp socket namespace
 local socket = require("socket")
 local tcp = assert(socket.tcp())
 
-password = "tevon"
-fname = "temp4.jpg"
+password = "nope"
+fname = "temp5.jpg"
 
 
 --f,e = ftp.put("ftp://tjw0018:".. password .."@34.240.251.252/var/www/html/videos/codeUpload/temp.jpg;type=i") --login to ftp server and fetch file at given directory using binary mode (not ascii)
@@ -136,10 +136,10 @@ tcp:send("qrgrab")
 tcp:send("/var/www/html/videos/codeUpload/"..fname)
 local s, status, partial = tcp:receive()
 tcp:close()
-print ("the data was " .. s)
+print ("the data was " .. (s or partial))
 
 
-f,e = ftp.get("ftp://tjw0018:".. password .."@34.230.251.252"..s..";type=i") --login to ftp server and fetch file at given directory using binary mode (not ascii)
+f,e = ftp.get("ftp://username:".. password .."@34.230.251.252".. (s or partial) ..";type=i") --login to ftp server and fetch file at given directory using binary mode (not ascii)
 
 local path = system.pathForFile( "downloadedFile.mov",system.DocumentsDirectory) --get system (lua) Documents directory
 

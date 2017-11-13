@@ -10,7 +10,7 @@ password = "tevon"
 randNum = math.random(1000)
 fname = "vid".. randNum ..".mov"
 
---print( "the file name is" .. fname)
+print( "the file name is" .. fname)
 
 --f,e = ftp.put("ftp://tjw0018:".. password .."@34.240.251.252/var/www/html/videos/codeUpload/temp.jpg;type=i") --login to ftp server and fetch file at given directory using binary mode (not ascii)
 
