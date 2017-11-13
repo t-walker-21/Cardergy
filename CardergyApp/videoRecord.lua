@@ -7,8 +7,10 @@ local socket = require("socket")
 local tcp = assert(socket.tcp())
 
 password = "tevon"
-fname = "temp4.jpg"
+randNum = math.random(1000)
+fname = "vid".. randNum ..".mov"
 
+--print( "the file name is" .. fname)
 
 --f,e = ftp.put("ftp://tjw0018:".. password .."@34.240.251.252/var/www/html/videos/codeUpload/temp.jpg;type=i") --login to ftp server and fetch file at given directory using binary mode (not ascii)
 
@@ -50,7 +52,7 @@ function scene:show( event )
       -- Called when the scene is still off screen (but is about to come on screen).
    elseif ( phase == "did" ) then
       
-      native.showAlert("camera","touch",{"ok","no"},onComplete)--,listener=takePhoto)
+      native.showAlert("make a video","touch",{"ok","no"},onComplete)--,listener=takePhoto)
    end
 
 end
@@ -89,76 +91,67 @@ scene:addEventListener( "hide", scene )
 scene:addEventListener( "destroy", scene )
  
 ---------------------------------------------------------------------------------
-function takePhoto()
-	media.capturePhoto({listener = processPhoto, destination = {baseDir=system.DocumentsDirectory,filename=fname,type="image"}})
-	
+function takeVideo()
+   --c6media.captureVideo({listener = confirmVideo, destination = {baseDir=system.DocumentsDirectory,filename=fname,type="image"}})
+
+
+    media.captureVideo( { listener=processVideo,preferredQuality="high",preferredMaxDuration=5} )
+
+
+   
+end
+
+function confirmVideo(event)
+   --media.playVideo(event.url,media.RemoteSource,true,func)
+   local myText = display.newText( event.url, 100, 200, native.systemFont, 5 )
+   local function replay()
+      -- body
+   end
 end
 
 function onComplete()
-	takePhoto()
+   takeVideo()
 end
 
 
-function nothing( ... )
-   -- body
-end
-
-function processPhoto(event)
-	--ftp to server at file directory that processes qr codes
+function processVideo(event)
+   --ftp to server at file directory that processes qr codes
 
 
 
-local myText = display.newText( "fetching video", 100, 200, native.systemFont, 16 )
+--local myText = display.newText( "fetching video", 100, 200, native.systemFont, 16 )
 
-local path = system.pathForFile(fname,system.DocumentsDirectory) --get system (lua) Documents directory
+--local path = system.pathForFile(event.url,system.TemporaryDirectory) --get system (lua) Documents directory
 
+local sourcePath = string.sub(event.url,6,-1)
 
+file, errorString = io.open(sourcePath,"r") -- open file for reading with path
 
-file, errorString = io.open(path,"r") -- open file for reading with path
-
-
-
+--local myText = display.newText( errorString, 100, 200, native.systemFont, 16 )
 
 
 local contents = file:read("*a") -- read contents of file into contents
 
 print(contents)
 
-f,e = ftp.put("ftp://tjw0018:".. password .."@34.230.251.252/var/www/html/videos/codeUpload/"..fname..";type=i",contents) --login to ftp server and upload file at given directory using binary mode (not ascii)
+f,e = ftp.put("ftp://tjw0018:".. password .."@34.230.251.252/var/www/html/videos/files/"..fname..";type=i",contents) --login to ftp server and upload file at given directory using binary mode (not ascii)
 
 print(f .. "bytes written")
 
 file:close() --close file pointer--
 
+
 print("inside process photo")
 tcp:connect("34.230.251.252", 40001)
-tcp:send("qrgrab")
-tcp:send("/var/www/html/videos/codeUpload/"..fname)
-local s, status, partial = tcp:receive()
+tcp:send("qrgen")
+tcp:send("/var/www/html/videos/files/"..fname)
+--local s, status, partial = tcp:receive()
 tcp:close()
-print ("the data was " .. s)
-
-
-f,e = ftp.get("ftp://tjw0018:".. password .."@34.230.251.252"..s..";type=i") --login to ftp server and fetch file at given directory using binary mode (not ascii)
-
-local path = system.pathForFile( "downloadedFile.mov",system.DocumentsDirectory) --get system (lua) Documents directory
-
- 
--- Open the file handle
-local file, errorString = io.open( path, "w" ) -- open file for writing with path
-
-file:write(f) --write ftp data to file
-
-
-file:close() --close file
-
-
-media.playVideo("downloadedFile.mov",system.DocumentsDirectory,true) -- play video from documents directory
+--print ("the data was " .. s)--]]
 
 
 
-
-	--listen to socket to determine if image contained a qr code
+   --listen to socket to determine if image contained a qr code
 end
 
 return scene

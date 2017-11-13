@@ -28,6 +28,13 @@ function scene:create( event )
    topbarContainer:insert(topbarBackground, true)
 
    local function menuEvent(event)
+
+      local options = {
+         effect = "slideRight",
+         time = 800
+      }
+      composer.gotoScene("videoRecord", options)
+
    end
 
    menuBtn = widget.newButton({
