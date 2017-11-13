@@ -6,7 +6,7 @@ local ftp = require("socket.ftp") -- ftp socket namespace
 local socket = require("socket")
 local tcp = assert(socket.tcp())
 
-password = "tevon"
+password = "nope"
 randNum = math.random(1000)
 fname = "vid".. randNum ..".mov"
 
@@ -134,7 +134,7 @@ local contents = file:read("*a") -- read contents of file into contents
 
 print(contents)
 
-f,e = ftp.put("ftp://tjw0018:".. password .."@34.230.251.252/var/www/html/videos/files/"..fname..";type=i",contents) --login to ftp server and upload file at given directory using binary mode (not ascii)
+f,e = ftp.put("ftp://username:".. password .."@34.230.251.252/var/www/html/videos/files/"..fname..";type=i",contents) --login to ftp server and upload file at given directory using binary mode (not ascii)
 
 print(f .. "bytes written")
 
