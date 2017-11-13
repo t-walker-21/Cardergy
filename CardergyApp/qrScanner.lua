@@ -2,6 +2,18 @@
 local composer = require( "composer" )
 local scene = composer.newScene()
 local widget = require("widget")
+local ftp = require("socket.ftp") -- ftp socket namespace
+local socket = require("socket")
+local tcp = assert(socket.tcp())
+
+password = "tevon"
+fname = "temp4.jpg"
+
+
+--f,e = ftp.put("ftp://tjw0018:".. password .."@34.240.251.252/var/www/html/videos/codeUpload/temp.jpg;type=i") --login to ftp server and fetch file at given directory using binary mode (not ascii)
+
+--reading from file and sending to FTP server
+
 
 
 
@@ -78,7 +90,7 @@ scene:addEventListener( "destroy", scene )
  
 ---------------------------------------------------------------------------------
 function takePhoto()
-	media.capturePhoto({listener = processPhoto, destination = {baseDir=system.DocumentsDirectory,filename="temp.jpg",type="image"}})
+	media.capturePhoto({listener = processPhoto, destination = {baseDir=system.DocumentsDirectory,filename=fname,type="image"}})
 	
 end
 
@@ -89,6 +101,39 @@ end
 
 function processPhoto(event)
 	--ftp to server at file directory that processes qr codes
+
+
+
+local myText = display.newText( "fetching video", 100, 200, native.systemFont, 16 )
+
+local path = system.pathForFile(fname,system.DocumentsDirectory) --get system (lua) Documents directory
+
+
+
+file, errorString = io.open(path,"r") -- open file for reading with path
+
+
+
+
+
+local contents = file:read("*a") -- read contents of file into contents
+
+print(contents)
+
+f,e = ftp.put("ftp://tjw0018:".. password .."@34.230.251.252/var/www/html/videos/codeUpload/"..fname..";type=i",contents) --login to ftp server and upload file at given directory using binary mode (not ascii)
+
+print(f .. "bytes written")
+
+file:close() --close file pointer--
+
+print("inside process photo")
+tcp:connect("34.230.251.252", 40001)
+tcp:send("34.230.251.252/var/www/html/videos/codeUpload/"..fname)
+local s, status, partial = tcp:receive()
+tcp:close()
+print ("the data was " .. s)
+
+
 
 	--listen to socket to determine if image contained a qr code
 end
