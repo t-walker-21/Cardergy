@@ -27,8 +27,15 @@ function scene:create( event )
 	local topbarContainer = display.newContainer(display.contentWidth, 60)
    topbarContainer:translate(display.contentWidth * 0.5, -5)
 
+   local paint = {
+		type = "gradient",
+		color1 = {248/255,181/255,0/255},
+		color2 = {252/255,234/255,187/255},
+		direction = "down"
+	}
+
    local topbarBackground = display.newRect(display.contentCenterX, display.contentCenterY, display.contentWidth, 60)
-   topbarBackground:setFillColor(135/255,206/255,250/255)
+   topbarBackground.fill = paint
    topbarContainer:insert(topbarBackground, true)
 
    local function backIcnEvent(event)
@@ -61,7 +68,7 @@ function scene:create( event )
    menuBtn.x = -105
    menuBtn.y = 10
 
-   topbarInsignia = display.newImageRect("logo_black.png", 128, 45)
+   topbarInsignia = display.newImageRect("logo_black.png", 100, 33)
    topbarInsignia.y = 10
 
    topbarContainer:insert(topbarInsignia)

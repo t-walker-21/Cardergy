@@ -115,7 +115,7 @@ function scene:create( event )
 	initialBall()
 	------------------PHYSICS SECTION----------------------------------------------------------
 
-	local logo = display.newImageRect("logo_white.png", 342, 120)
+	local logo = display.newImageRect("logo_white.png", 300, 100)
 	logo.x = display.contentCenterX
 	logo.y = display.contentCenterY-100
 	logo:toFront()
