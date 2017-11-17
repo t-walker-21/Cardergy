@@ -19,16 +19,6 @@ function scene:create( event )
 
    	-- Initialize the scene here.
    	-- Example: add display objects to "sceneGroup", add touch listeners, etc.
-   	local paint = {
-	    type = "gradient",
-	    color1 = {115/255,3/255,192/255},
-	    color2 = {253/255,239/255,249/255},
-	    direction = "down"
-	}
-
-	local bg = display.newRect(display.contentCenterX, display.contentCenterY, 320, 570)
-	bg.fill = paint
-	bg:toBack()
 
 	------------------PHYSICS SECTION----------------------------------------------------------
 	leftWall = display.newRect(-1, display.contentCenterY, 1, 570)

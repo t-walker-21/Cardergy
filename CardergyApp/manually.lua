@@ -2,15 +2,10 @@ local socket = require("socket")
 local composer = require("composer")
 local scene = composer.newScene()
 local widget = require("widget")
-local host, port = "34.230.251.252", 40000
-local socket = require("socket")
-local tcp = assert(socket.tcp())
 local name, address, city, state, zip
-local regStr2 = ""
-local submitBtn = nil
+local writeMsgBtn = nil
 local errorOpts = nil
 local sceneGroup = nil
-local previous = false
 local stateMatch = false
 local validName,validAddress,validCity,validState,validZip = false
 local nameField, addressField, cityField, stateField, zipField = nil
@@ -25,9 +20,73 @@ end
 function scene:create( event )
  
    	sceneGroup = self.view
+   	local g = display.newGroup()
 
    	-- Initialize the scene here.
    	-- Example: add display objects to "sceneGroup", add touch listeners, etc.
+	local topbarContainer = display.newContainer(display.contentWidth, 60)
+   topbarContainer:translate(display.contentWidth * 0.5, -5)
+
+   local topbarBackground = display.newRect(display.contentCenterX, display.contentCenterY, display.contentWidth, 60)
+   topbarBackground:setFillColor(135/255,206/255,250/255)
+   topbarContainer:insert(topbarBackground, true)
+
+   local function backIcnEvent(event)
+      local options = {
+         effect = "slideRight",
+         time = 800
+      }
+      composer.gotoScene("item", options)
+   end
+
+   backIcn = widget.newButton({
+      width = 30,
+      height = 30,
+      defaultFile = "back_icon.png",
+      --overFile = "back_pressed.png"
+      onRelease = backIcnEvent
+   }) 
+   topbarContainer:insert(backIcn)
+   backIcn.x = -140
+   backIcn.y = 10
+
+   menuBtn = widget.newButton({
+         width = 30,
+         height = 30,
+         defaultFile = "menu_icon.png",
+         --overFile = "menu_pressed.png",
+         onRelease = menuEvent
+   })
+   topbarContainer:insert(menuBtn, true)
+   menuBtn.x = -105
+   menuBtn.y = 10
+
+   topbarInsignia = display.newImageRect("logo_black.png", 128, 45)
+   topbarInsignia.y = 10
+
+   topbarContainer:insert(topbarInsignia)
+
+   local function cameraEvent(event)
+   end
+
+   cameraBtn = widget.newButton({
+         width = 30,
+         height = 30,
+         defaultFile = "camera_icon.png",
+         --overFile = "camera_pressed.png",
+         onRlease = cameraEvent
+   })
+   topbarContainer:insert(cameraBtn)
+   cameraBtn.x = 140
+   cameraBtn.y = 10
+
+   topbarContainer.y = 30
+
+   sceneGroup:insert(topbarContainer)
+
+   	recipientTxt = display.newText("Recipient Info", display.contentCenterX, display.contentCenterY-180, native.systemFont, 32)
+   	sceneGroup:insert(recipientTxt)
+
 	local function changeError(f, t, s)
 		errOpts = {
 			isModal = true,
@@ -41,7 +100,7 @@ function scene:create( event )
 		}
 	end
 
-	local function submitEvent(event)
+	local function writeMsgEvent(event)
 		for i=1,50 do
 			if (states[i] == stateField.text) then
 				stateMatch = true
@@ -99,23 +158,19 @@ function scene:create( event )
 			city = cityField.text
 			state = stateField.text
 			zip = zipField.text
-			regStr1 = composer.getVariable("regStr1")
-			regStr2 = name..":"..address..":"..city..":"..state..":"..zip.."\n"
-			composer.setVariable("regStr1", regStr1)
 			
-			tcp:connect(host, port)
-			tcp:send(regStr1..regStr2)
-		   	local s, status, partial = tcp:receive()
-		   	tcp:close()
+			composer.setVariable("recipientName", name)
+			composer.setVariable("recipientAddress", address)
+			composer.setVariable("recipientCity", city)
+			composer.setVariable("recipientState", state)
+			composer.setVariable("recipientZip", zip)
 
-			if (s == "register_fail" or partial == "register_fail") then
-				changeError(nil, "ERROR", "Database problem. Try again later.")
-				composer.showOverlay("error", errOpts)
-			else
-				composer.setVariable("passScene", "regScene")
-				changeError(nil, "SUCCESS", "Registration successful.")
-				composer.showOverlay("error", errOpts)
-			end
+			local options = {
+				effect = "slideLeft",
+				time = 800
+			}
+
+			composer.gotoScene("message", options)
 		end
 
 		stateMatch = false
@@ -123,33 +178,33 @@ function scene:create( event )
 	end
 
 	local function validateInput()
-		display.remove(submitBtn)
+		display.remove(writeMsgBtn)
 		if (validName == true and validAddress == true and validCity == true and validState == true and validZip == true) then
-			submitBtn = widget.newButton(
+			writeMsgBtn = widget.newButton(
 			{
-				label = "Submit",
+				label = "Write Message",
 				fontSize = 20,
 				font = native.systemFontBold,
 				emboss = true,
-				onRelease = submitEvent,
+				onRelease = writeMsgEvent,
 				shape = "roundedRect",
 				width = 220,
 				height = 60,
 				cornerRadius = 30,
 				fillColor = {default={1,1,1}, over={1,0,0.5}}
 			})
-			submitBtn.x = display.contentCenterX
-			submitBtn.y = display.contentCenterY + 115
-			submitBtn:setEnabled(true)
-			sceneGroup:insert(submitBtn)
+			writeMsgBtn.x = display.contentCenterX
+			writeMsgBtn.y = display.contentCenterY + 115
+			writeMsgBtn:setEnabled(true)
+			sceneGroup:insert(writeMsgBtn)
 		else
-			submitBtn = widget.newButton(
+			writeMsgBtn = widget.newButton(
 			{
-				label = "Submit",
+				label = "Write Message",
 				fontSize = 20,
 				font = native.systemFontBold,
 				emboss = true,
-				onRelease = submitEvent,
+				onRelease = writeMsgEvent,
 				shape = "roundedRect",
 				width = 220,
 				height = 60,
@@ -157,10 +212,10 @@ function scene:create( event )
 				fillColor = {default={211/255,211/255,211/255}, over={1,0,0.5}},
 				labelColor = {default={169/255,169/255,169/255}, over={0,0,0.5}}
 			})
-			submitBtn.x = display.contentCenterX
-			submitBtn.y = display.contentCenterY + 115
-			submitBtn:setEnabled(false)
-			sceneGroup:insert(submitBtn)
+			writeMsgBtn.x = display.contentCenterX
+			writeMsgBtn.y = display.contentCenterY + 115
+			writeMsgBtn:setEnabled(false)
+			sceneGroup:insert(writeMsgBtn)
 		end
 	end
 
@@ -330,13 +385,13 @@ function scene:create( event )
 	sceneGroup:insert(stateField)
 	sceneGroup:insert(zipField)
 
-	submitBtn = widget.newButton(
+	writeMsgBtn = widget.newButton(
 	{
-		label = "Submit",
+		label = "Write Message",
 		fontSize = 20,
 		font = native.systemFontBold,
 		emboss = true,
-		onRelease = submitEvent,
+		onRelease = writeMsgEvent,
 		shape = "roundedRect",
 		width = 220,
 		height = 60,
@@ -344,10 +399,10 @@ function scene:create( event )
 		fillColor = {default={211/255,211/255,211/255}, over={1,0,0.5}},
 		labelColor = {default={169/255,169/255,169/255}, over={0,0,0.5}}
 	})
-	submitBtn.x = display.contentCenterX
-	submitBtn.y = display.contentCenterY + 115
-	submitBtn:setEnabled(true)
-	sceneGroup:insert(submitBtn)
+	writeMsgBtn.x = display.contentCenterX
+	writeMsgBtn.y = display.contentCenterY + 115
+	writeMsgBtn:setEnabled(true)
+	sceneGroup:insert(writeMsgBtn)
 
 	local function removeKeyboard()
 		native.setKeyboardFocus(nil)
@@ -364,7 +419,6 @@ function scene:show( event )
  
    if ( phase == "will" ) then
       -- Called when the scene is still off screen (but is about to come on screen).
-      composer.setVariable("back", 2)
    elseif ( phase == "did" ) then
       -- Called when the scene is now on screen.
       -- Insert code here to make the scene come alive.

@@ -10,6 +10,7 @@ local tableView = nil
 local rowCnt = 0
 local parts
 local tableFlag = false
+local rowData = {}
 --local tableHeight = numRows * heightEachRow
  
 ---------------------------------------------------------------------------------
@@ -105,6 +106,7 @@ function scene:create( event )
       local rowWidth = row.contentWidth
       local result = parts[row.index+1]:split()
       local userStr = result[1]
+      rowData[row.index] = userStr
       local firstStr = result[2]
       local lastStr = result[3]
 
@@ -121,6 +123,19 @@ function scene:create( event )
       nameTxt.y = rowHeight * 0.5
    end
 
+   local function onRowTouch(event)
+      local row = event.row
+      --print(tableView._view._rows[row.index])
+      composer.setVariable("recipientUser", rowData[row.index])
+
+      local options = {
+         effect = "slideLeft",
+         time = 800
+      }
+
+      composer.gotoScene("message", options)
+   end
+
    local function onSearch(event)
       if ("began" == event.phase) then
       elseif ("editing" == event.phase) then
@@ -129,6 +144,7 @@ function scene:create( event )
          end
 
          tableFlag = false
+         rowData = {}
 
          search = "search:"..searchField.text
          tcp:connect(host, port)
@@ -149,7 +165,7 @@ function scene:create( event )
             width = 320,
             onRowRender = onRowRender,
             onRowTouch = onRowTouch,
-            listener = scrollListener
+            listener = scrollListener,
          })
          tableView.anchorY = 0
          tableView.x = display.contentCenterX
@@ -179,7 +195,7 @@ function scene:create( event )
    searchField = native.newTextField(0, 0, 300, 30)
    searchField.inputType = "default"
    searchField:setReturnKey("done")
-   searchField.placeholder = "Search..."
+   searchField.placeholder = "Search for user..."
    searchField:addEventListener("userInput", onSearch)
    topbarContainer:insert(searchField)
    searchField.y = 30

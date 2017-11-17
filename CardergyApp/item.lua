@@ -90,7 +90,7 @@ function scene:create( event )
    styleTxt.x = 5
    card = display.newImageRect("start_card.png", 157, 250)
    card.x = display.contentCenterX
-   card.y = display.contentCenterY - 35
+   card.y = display.contentCenterY - 20
    sceneGroup:insert(genreTxt)
    sceneGroup:insert(styleTxt)
    sceneGroup:insert(card)
@@ -106,7 +106,7 @@ function scene:create( event )
          if (i == 1) then
             composer.gotoScene("search", options)
          elseif (i == 2) then
-            composer.gotoScene("manually")
+            composer.gotoScene("manually", options)
          end
       end
 
@@ -127,9 +127,10 @@ function scene:create( event )
       fillColor = {default={1,1,1}, over={1,0,0.5}},
    })
    continueBtn.x = display.contentCenterX
-   continueBtn.y = display.contentCenterY + 135
+   continueBtn.y = display.contentCenterY + 165
    sceneGroup:insert(continueBtn)
 
+   --[[
    local function backBtnEvent(event)
       local options = {
          effect = "slideRight",
@@ -153,7 +154,7 @@ function scene:create( event )
    })
    backBtn.x = display.contentCenterX
    backBtn.y = display.contentCenterY + 210
-   sceneGroup:insert(backBtn)
+   sceneGroup:insert(backBtn)--]]
 end
  
 -- "scene:show()"
@@ -168,6 +169,7 @@ function scene:show( event )
       -- Called when the scene is now on screen.
       -- Insert code here to make the scene come alive.
       -- Example: start timers, begin animation, play audio, etc.
+      composer.removeScene("manually")
    end
 end
  
