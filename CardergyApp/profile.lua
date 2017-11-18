@@ -54,7 +54,7 @@ function scene:create( event )
          --overFile = "menu_pressed.png",
          onRelease = menuEvent
    })
-   topbarContainer:insert(menuBtn, true)
+   topbarContainer:insert(menuBtn)
    menuBtn.x = -140
    menuBtn.y = 10
 
@@ -197,7 +197,7 @@ function scene:create( event )
    -- Create the widget
    local tableView = widget.newTableView({
       height = 330,
-      width = 355,
+      width = 320,
       onRowRender = onRowRender,
       onRowTouch = onRowTouch,
       isLocked = true,
