@@ -6,7 +6,17 @@ local topbarContainer, topbarBackground, menuBtn, cameraBtn, topbarInsignia
 local host, port = "34.230.251.252", 40000
 local socket = require("socket")
 local tcp = assert(socket.tcp())
- 
+local Card = require("card")
+
+cardCategories = {"Holiday","Blessings","Birthday","Congradulations!","Invite"}
+tableFlag = false
+local parts
+rowCnt = 0
+images = {}
+categories = {}
+names = {}
+tableView = nil
+
 ---------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE
 -- unless "composer.removeScene()" is called.
@@ -76,41 +86,55 @@ function scene:create( event )
       return parts
    end
 
-   local function onRowRender(event)
-      local row = event.row
 
-      local rowHeight = row.contentHeight
-      local rowWidth = row.contentWidth
-      local result = parts[row.index+1]:split()
-      local userStr = result[1]
-      rowData[row.index] = userStr
-      local firstStr = result[2]
-      local lastStr = result[3]
+   local function onRowRender( event )
+ 
+    -- Get reference to the row group
+    local row = event.row
+ 
+    -- Cache the row "contentWidth" and "contentHeight" because the row bounds can change as children objects are added
+    local rowHeight = row.contentHeight
+    local rowWidth = row.contentWidth
+ 
+    local rowTitle = display.newText( row,cardCategories[row.index], 0, 0, nil, 14 )
+    rowTitle:setFillColor( 0 )
+ 
+    -- Align the label left and vertically centered
+    rowTitle.anchorX = 0
+    rowTitle.x = 100
+    rowTitle.y = rowHeight * 0.1
 
-      userTxt = display.newText(row, userStr, 0, 0, native.systemFont, 14)
-      userTxt:setFillColor(0,0,0)
-      userTxt.anchorX = 0
-      userTxt.x = 30
-      userTxt.y = rowHeight * 0.5
-
-      nameTxt = display.newText(row, firstStr.." "..lastStr, 0, 0, native.systemFont, 14)
-      nameTxt:setFillColor(0,0,0)
-      nameTxt.anchorX = 0
-      nameTxt.x = 120
-      nameTxt.y = rowHeight * 0.5
-   end
+    --Add row image to cells
+    local imageStr = "start_card.png"
+    local rowImage = display.newImageRect(row, imageStr,50,80)
+    rowImage.x = 55
+    rowImage.y = rowHeight/2
+    images[1] = imageStr
+    categories[1] = "Holiday"
+    names[1] = "Mustache"
+  end
 
    local function onRowTouch(event)
-      local row = event.row
-      --print(tableView._view._rows[row.index])
-      composer.setVariable("recipientUser", rowData[row.index])
+      if (event.phase == "release") then
+        local row = event.row
+        --print(tableView._view._rows[row.index])
+        --[[composer.setVariable("cardStyle", images[row.index])
+        composer.setvariable("cardName", names[row.index])
+        composer.setVariable("cardCategory", categories[row.index])--]]
+        local Niall = Card:new({})
+        Niall:setCategory(categories[row.index])
+        Niall:setBackImage(images[row.index])
+        Niall:setName(names[row.index])
 
-      local options = {
-         effect = "slideLeft",
-         time = 800
-      }
+        composer.setVariable("Niall", Niall)
 
-      composer.gotoScene("message", options)
+        local options = {
+           effect = "slideLeft",
+           time = 800
+        }
+
+        composer.gotoScene("item", options)
+      end
    end
 
    local function onSearch(event)
@@ -138,7 +162,7 @@ function scene:create( event )
          end
 
          tableView = widget.newTableView({
-            height = rowCnt * 35,
+            height = 600,--rowCnt * 35,
             width = 320,
             onRowRender = onRowRender,
             onRowTouch = onRowTouch,
@@ -152,7 +176,7 @@ function scene:create( event )
             for i = 1, rowCnt do
                -- Insert a row into the tableView
                tableView:insertRow({
-                  rowHeight = 35,
+                  rowHeight = 90,
                   rowColor = {default={249/255,250/255,252/255}}
                })
             end
