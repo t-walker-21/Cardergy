@@ -196,6 +196,7 @@ function scene:create( event )
             sceneGroup:insert(tableView)
          end
       elseif ("submitted" == event.phase) then
+        native.setKeyboardFocus(nil)
       elseif ("ended" == event.phase) then
       end
    end
@@ -211,6 +212,11 @@ function scene:create( event )
    topbarContainer.y = 50
 
    sceneGroup:insert(topbarContainer)
+   local function removeKeyboard()
+     native.setKeyboardFocus(nil)
+   end
+
+   Runtime:addEventListener("tap",removeKeyboard)
 end
  
 -- "scene:show()"

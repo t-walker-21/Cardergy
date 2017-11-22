@@ -150,8 +150,9 @@ tcp:send("qrgen:/var/www/html/videos/files/"..fname)
 tcp:close()
 --print ("the data was " .. s)--]]
 
-
-
+   
+   prevScene = composer.getSceneName("previous")
+   composer.gotoScene(prevScene)
    --listen to socket to determine if image contained a qr code
 end
 
