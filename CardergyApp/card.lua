@@ -1,5 +1,5 @@
 
-local Card = {category = "", message = "", qr = nil, backImage=nil }
+local Card = { name = "", category = "", message = "", qr = nil, backImage=nil }
 
 function Card:new (o)    --constructor
   o = o or {}; 
@@ -8,6 +8,9 @@ function Card:new (o)    --constructor
   return o;
 end
 
+function Card:setName(name)
+	self.name = name
+end
 
 function Card:setMessage(message)
  	self.message = message
@@ -17,11 +20,12 @@ function Card:setMessage(message)
  	self.qr = qr
  end
 
-
  function Card:setBackImage(backImage)
- 	self.message = backImage
+ 	self.backImage = backImage
  end
 
  function Card:setCategory(category)
  	self.category = category
  end
+
+ return Card

@@ -1,6 +1,3 @@
-
-cardCategories = {"Holiday","Blessings","Birthday","Congradulations!","Invite"}
-
 display.setStatusBar(display.DarkStatusBar)
 local composer = require( "composer" )
 local scene = composer.newScene()
@@ -9,7 +6,17 @@ local topbarContainer, topbarBackground, menuBtn, cameraBtn, topbarInsignia
 local host, port = "34.230.251.252", 40000
 local socket = require("socket")
 local tcp = assert(socket.tcp())
- 
+local Card = require("card")
+
+cardCategories = {"Holiday","Blessings","Birthday","Congradulations!","Invite"}
+tableFlag = false
+local parts
+rowCnt = 0
+images = {}
+categories = {}
+names = {}
+tableView = nil
+
 ---------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE
 -- unless "composer.removeScene()" is called.
@@ -101,19 +108,28 @@ function scene:create( event )
     local rowImage = display.newImage(row,"coffee50.png",0,0)
     rowImage.x = 55
     rowImage.y = rowHeight/2
-end
+    images[1] = rowImage
+    categories[1] = "Holiday"
+    names[1] = "Mustache"
+  end
 
    local function onRowTouch(event)
       local row = event.row
       --print(tableView._view._rows[row.index])
-      composer.setVariable("recipientUser", rowData[row.index])
+      --[[composer.setVariable("cardStyle", images[row.index])
+      composer.setvariable("cardName", names[row.index])
+      composer.setVariable("cardCategory", categories[row.index])--]]
+      local Niall = Card:new({})
+      Niall:setCategory(categories[row.index])
+      Niall:setBackImage(images[row.index])
+      Niall:setName(names[row.index])
 
       local options = {
          effect = "slideLeft",
          time = 800
       }
 
-      composer.gotoScene("message", options)
+      composer.gotoScene("item", options)
    end
 
    local function onSearch(event)
