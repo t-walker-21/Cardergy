@@ -98,7 +98,7 @@ function scene:create( event )
     rowTitle.y = rowHeight * 0.5
 
     --Add row image to cells
-    local rowImage = display.newImage(row,"start_card_resized.png",4,4)
+    local rowImage = display.newImageRect(row,"start_card.png",50,80)
     rowImage.x = 55
     rowImage.y = rowHeight/2
 end
@@ -120,7 +120,7 @@ local tableView = widget.newTableView(
 for i = 1, table.getn(cardCategories) do
  
     local isCategory = false
-    local rowHeight = 36
+    local rowHeight = 90
     local rowColor = { default={1,1,1}, over={1,0.5,0,0.2} }
     local lineColor = { 0.5, 0.5, 0.5 }
  
