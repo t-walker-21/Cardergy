@@ -105,7 +105,7 @@ function scene:create( event )
     rowTitle.y = rowHeight * 0.1
 
     --Add row image to cells
-    local rowImage = display.newImage(row,"coffee50.png",0,0)
+    local rowImage = display.newImageRect(row,"start_card.png",50,80)
     rowImage.x = 55
     rowImage.y = rowHeight/2
     images[1] = rowImage
