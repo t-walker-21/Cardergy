@@ -3,7 +3,7 @@ local composer = require("composer")
 local scene = composer.newScene()
 local widget = require("widget")
 local name, address, city, state, zip
-local recVidBtn = nil
+local orderBtn = nil
 local errorOpts = nil
 local sceneGroup = nil
 local validMsg = false
@@ -91,8 +91,8 @@ function scene:create( event )
 
    sceneGroup:insert(topbarContainer)
 
-   	recipientTxt = display.newText("Custom Message", display.contentCenterX, display.contentCenterY-180, native.systemFont, 32)
-   	sceneGroup:insert(recipientTxt)
+   	orderTxt = display.newText("Order Summary", display.contentCenterX, display.contentCenterY-180, native.systemFont, 32)
+   	sceneGroup:insert(orderTxt)
 
 	local function changeError(f, t, s)
 		errOpts = {
@@ -107,121 +107,40 @@ function scene:create( event )
 		}
 	end
 
-	local function recVidEvent(event)
+	Niall = composer.getVariable("Niall")
+	--orderImg = display.newImageRect("start_card.png",107,170)
+	--orderImg.x = display.contentCenterX - 90
+	--orderImg.y = display.contentCenterY - 70
+	orderVid = native.newVideo(display.contentCenterX,display.contentCenterY,320,480)
+	orderVid:load("detectingDrone.mov",system.DocumentsDirectory)
+	--orderVid:load(Niall.video,system.DocumentsDirectory
+	
+	--print("video:  " .. orderVid)
+	orderMsg = "Hello there"
 
-		if (string.len(msgField.text) > 1200) then
-			----sceneGroup.alpha = 0.5
-			changeError(msgField, "ERROR", "Message has gone over the 1200 character limit.")
-			composer.showOverlay("error", errOpts)
-		else
-			msg = msgField.text
-			
-			--composer.setVariable("recipientMsg", msg)
-			Niall = composer.getVariable("Niall")
-			Niall:setMessage(msg)
-			composer.setVariable("Niall", Niall)
-			
-
-			local options = {
-				effect = "slideLeft",
-				time = 800
-			}
-
-			composer.gotoScene("videoRecord", options)
-		end
-
-		stateMatch = false
-		--transition.moveTo(sceneGroup, {x=display.contentCenterX, y=display.contentCenterY-100})
-	end
-
-	local function validateInput()
-		display.remove(recVidBtn)
-		if (validMsg == true) then
-			recVidBtn = widget.newButton(
-			{
-				label = "Record Video",
-				fontSize = 20,
-				font = native.systemFontBold,
-				emboss = true,
-				onRelease = recVidEvent,
-				shape = "roundedRect",
-				width = 220,
-				height = 60,
-				cornerRadius = 30,
-				fillColor = {default={1,1,1}, over={1,0,0.5}}
-			})
-			recVidBtn.x = display.contentCenterX
-			recVidBtn.y = display.contentCenterY + 200
-			recVidBtn:setEnabled(true)
-			sceneGroup:insert(recVidBtn)
-		else
-			recVidBtn = widget.newButton(
-			{
-				label = "Record Video",
-				fontSize = 20,
-				font = native.systemFontBold,
-				emboss = true,
-				onRelease = recVidEvent,
-				shape = "roundedRect",
-				width = 220,
-				height = 60,
-				cornerRadius = 30,
-				fillColor = {default={211/255,211/255,211/255}, over={1,0,0.5}},
-				labelColor = {default={169/255,169/255,169/255}, over={0,0,0.5}}
-			})
-			recVidBtn.x = display.contentCenterX
-			recVidBtn.y = display.contentCenterY + 200
-			recVidBtn:setEnabled(false)
-			sceneGroup:insert(recVidBtn)
-		end
-	end
+	--msgField = native.newTextBox(display.contentCenterX, display.contentCenterY + 50, 250, 150)
+	--msgField.y = display.contentCenterY + 105
+	--msgField.inputType = "default"
+	--msgField:setReturnKey("done")
+	--msgField.isEditable = false
+	--msgField.size = 20
+	--msgField.isFontSizeScaled = false
+	--msgField.text = Niall.video
+	--sceneGroup:insert(msgField)
+	sceneGroup:insert(orderVid)
 
 	
 
-	local function onMsg(event)
-		if ("began" == event.phase) then
-		elseif ("editing" == event.phase) then
-			validMsg = false
-			validateInput()
-		elseif ("submitted" == event.phase) then
-			if (msgField.text ~= "") then
-				validMsg = true
-				validateInput()
-			else
-				validMsg = false
-				validateInput()
-			end
-
-			native.setKeyboardFocus(nil)
-		elseif ("ended" == event.phase) then
-			if (msgField.text ~= "") then
-				validMsg = true
-				validateInput()
-			else
-				validMsg = false
-				validateInput()
-			end
-		end
+	local function orderEvent(event)
 	end
 
-	msgField = native.newTextBox(display.contentCenterX, display.contentCenterY, 300, 300)
-	msgField.inputType = "default"
-	--msgField:setReturnKey("done")
-	msgField.placeholder = "Write a message to your\nselected recipient..."
-	msgField.isEditable = true
-	msgField.size = 20
-	msgField.isFontSizeScaled = false
-	msgField:addEventListener("userInput", onMsg)
-
-	sceneGroup:insert(msgField)
-
-	recVidBtn = widget.newButton(
+	orderBtn = widget.newButton(
 	{
-		label = "Record Video",
+		label = "Submit Order",
 		fontSize = 20,
 		font = native.systemFontBold,
 		emboss = true,
-		onRelease = recVidEvent,
+		onRelease = orderEvent,
 		shape = "roundedRect",
 		width = 220,
 		height = 60,
@@ -229,10 +148,10 @@ function scene:create( event )
 		fillColor = {default={211/255,211/255,211/255}, over={1,0,0.5}},
 		labelColor = {default={169/255,169/255,169/255}, over={0,0,0.5}}
 	})
-	recVidBtn.x = display.contentCenterX
-	recVidBtn.y = display.contentCenterY+ 200
-	recVidBtn:setEnabled(true)
-	sceneGroup:insert(recVidBtn)
+	orderBtn.x = display.contentCenterX
+	orderBtn.y = display.contentCenterY+ 225
+	orderBtn:setEnabled(true)
+	sceneGroup:insert(orderBtn)
 
 	local function removeKeyboard()
 		native.setKeyboardFocus(nil)
@@ -253,6 +172,7 @@ function scene:show( event )
       -- Called when the scene is now on screen.
       -- Insert code here to make the scene come alive.
       -- Example: start timers, begin animation, play audio, etc.
+      --orderVid:play()
    end
 end
  
