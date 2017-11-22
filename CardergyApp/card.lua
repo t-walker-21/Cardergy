@@ -1,5 +1,5 @@
 
-local Card = { name = "", category = "", message = "", qr = nil, backImage=nil }
+local Card = { name = "", category = "", message = "", qr = "", backImage="" }
 
 function Card:new (o)    --constructor
   o = o or {}; 

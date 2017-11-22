@@ -105,31 +105,36 @@ function scene:create( event )
     rowTitle.y = rowHeight * 0.1
 
     --Add row image to cells
-    local rowImage = display.newImageRect(row,"start_card.png",50,80)
+    local imageStr = "start_card.png"
+    local rowImage = display.newImageRect(row, imageStr,50,80)
     rowImage.x = 55
     rowImage.y = rowHeight/2
-    images[1] = rowImage
+    images[1] = imageStr
     categories[1] = "Holiday"
     names[1] = "Mustache"
   end
 
    local function onRowTouch(event)
-      local row = event.row
-      --print(tableView._view._rows[row.index])
-      --[[composer.setVariable("cardStyle", images[row.index])
-      composer.setvariable("cardName", names[row.index])
-      composer.setVariable("cardCategory", categories[row.index])--]]
-      local Niall = Card:new({})
-      Niall:setCategory(categories[row.index])
-      Niall:setBackImage(images[row.index])
-      Niall:setName(names[row.index])
+      if (event.phase == "release") then
+        local row = event.row
+        --print(tableView._view._rows[row.index])
+        --[[composer.setVariable("cardStyle", images[row.index])
+        composer.setvariable("cardName", names[row.index])
+        composer.setVariable("cardCategory", categories[row.index])--]]
+        local Niall = Card:new({})
+        Niall:setCategory(categories[row.index])
+        Niall:setBackImage(images[row.index])
+        Niall:setName(names[row.index])
 
-      local options = {
-         effect = "slideLeft",
-         time = 800
-      }
+        composer.setVariable("Niall", Niall)
 
-      composer.gotoScene("item", options)
+        local options = {
+           effect = "slideLeft",
+           time = 800
+        }
+
+        composer.gotoScene("item", options)
+      end
    end
 
    local function onSearch(event)
