@@ -119,7 +119,7 @@ function scene:create( event )
 		media.playVideo(Niall.video,system.DocumentsDirectory,true)
 	end
 
-	orderMsg = "Hello there"
+	orderMsg = nil
 
 	msgField = native.newTextBox(display.contentCenterX, display.contentCenterY + 50, 250, 150)
 	msgField.y = display.contentCenterY + 105
@@ -130,10 +130,14 @@ function scene:create( event )
 	msgField.isFontSizeScaled = false
 	msgField.text = Niall.message
 	--sceneGroup:insert(msgField)
-	rect = display.newImage("playbutt.png",170,170)
+	rect = display.newImage("playbutt.png",120,120)
 	rect.x = display.contentCenterX + 50
-	rect.y = display.contentCenterY - 40
+	rect.y = display.contentCenterY - 90
 	rect:addEventListener("tap",playVideo)
+
+	receipient = display.newText("Recipient:" .. composer.getVariable("recipientUser"),display.contentCenterX+50, display.contentCenterY-10, native.systemFont, 17)
+
+
 	--sceneGroup:insert(orderVid)
 
 	

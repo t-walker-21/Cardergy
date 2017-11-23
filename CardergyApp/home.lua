@@ -57,18 +57,17 @@ function scene:create( event )
     direction = "down"
   }
 
-   topbarBackground = display.newRect(display.contentCenterX, display.contentCenterY, display.contentWidth, 100)
-   topbarBackground.fill = paint
-
+   
    -- Background for the top menu bar
    topbarBackground = display.newRect(display.contentCenterX, 50, display.contentWidth, 100)
    topbarBackground:setFillColor(135/255,206/255,250/255)
+   topbarBackground.fill = paint
 
    topbarContainer:insert(topbarBackground, true)
 
    -- Handle the menu button's touch events
    function menuEvent(event)
-      -- hide the search bar because it's a bitch
+      -- hide the search bar because it's a pain
       searchField.isVisible = false
       
       -- Show the overlay in all its glory
