@@ -49,9 +49,21 @@ function scene:create( event )
    topbarContainer = display.newContainer(display.contentWidth, 100)
    topbarContainer:translate(display.contentWidth * 0.5, -5)
 
+
+   local paint = {
+    type = "gradient",
+    color1 = {248/255,181/255,0/255},
+    color2 = {252/255,234/255,187/255},
+    direction = "down"
+  }
+
+   topbarBackground = display.newRect(display.contentCenterX, display.contentCenterY, display.contentWidth, 100)
+   topbarBackground.fill = paint
+
    -- Background for the top menu bar
    topbarBackground = display.newRect(display.contentCenterX, 50, display.contentWidth, 100)
    topbarBackground:setFillColor(135/255,206/255,250/255)
+
    topbarContainer:insert(topbarBackground, true)
 
    -- Handle the menu button's touch events
@@ -215,6 +227,7 @@ function scene:create( event )
             sceneGroup:insert(tableView)
          end
       elseif ("submitted" == event.phase) then
+        native.setKeyboardFocus(nil)
       elseif ("ended" == event.phase) then
       end
    end
@@ -275,12 +288,20 @@ function scene:create( event )
    -- sceneGroup:insert(scrollView)
    -- sceneGroup:insert(scrollBackground)
    sceneGroup:insert(topbarContainer)
+
+   local function removeKeyboard()
+     native.setKeyboardFocus(nil)
+   end
+
+   Runtime:addEventListener("tap",removeKeyboard)
+
    -- sceneGroup:insert(topbarBackground)
    -- sceneGroup:insert(menuBtn)
    -- sceneGroup:insert(cameraBtn)
    -- sceneGroup:insert(topbarInsignia)
    -- sceneGroup:insert(searchField)
    -- sceneGroup:insert(scrollBackground)
+
 end
  
 -- "scene:show()"
