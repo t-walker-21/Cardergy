@@ -2,11 +2,15 @@ local socket = require("socket")
 local composer = require("composer")
 local scene = composer.newScene()
 local widget = require("widget")
+local ftp = require("socket.ftp") -- ftp socket namespace
+local tcp = assert(socket.tcp())
 local name, address, city, state, zip
 local orderBtn = nil
 local errorOpts = nil
 local sceneGroup = nil
 local validMsg = false
+
+password = "tevon"
 
 function scene:revertAlpha(field)
 	--sceneGroup.alpha = 1
@@ -119,7 +123,6 @@ function scene:create( event )
 		media.playVideo(Niall.video,system.DocumentsDirectory,true)
 	end
 
-	orderMsg = nil
 
 	msgField = native.newTextBox(display.contentCenterX, display.contentCenterY + 50, 250, 150)
 	msgField.y = display.contentCenterY + 105
@@ -129,22 +132,68 @@ function scene:create( event )
 	msgField.size = 20
 	msgField.isFontSizeScaled = false
 	msgField.text = Niall.message
-	--sceneGroup:insert(msgField)
+	sceneGroup:insert(msgField)
 	rect = display.newImage("playbutt.png",120,120)
 	rect.x = display.contentCenterX + 50
 	rect.y = display.contentCenterY - 90
 	rect:addEventListener("tap",playVideo)
 
-	receipient = display.newText("Recipient:" .. composer.getVariable("recipientUser"),display.contentCenterX+50, display.contentCenterY-10, native.systemFont, 17)
+	--recipient = display.newText("Recipient:" .. composer.getVariable("recipientUser"),display.contentCenterX+50, display.contentCenterY-10, native.systemFont, 17)
 
 
-	--sceneGroup:insert(orderVid)
-
+	sceneGroup:insert(msgField)
+	sceneGroup:insert(rect)
+	sceneGroup:insert(orderImg)
+	sceneGroup:insert(orderTxt)
+	--sceneGroup:insert(recipient)
+	
 	
 
-	
+	local function orderEvent(event) -- function to push card object to server and ftp video to user directory
 
-	local function orderEvent(event)
+		orderType = composer.getVariable("recipientFlag")
+		sUser = composer.getVariable("user")
+
+		if (orderType == "auto") then
+			--
+			rUser = composer.getVariable("recipientUser")
+		else
+			name = composer.getVariable("recipientName")
+			address = composer.getVariable("recipientAddress")
+			city = composer.getVariable("recipientCity")
+			state = composer.getVariable("recipientState")
+			zip = composer.getVariable("recipientZip")
+		end
+
+		
+
+		local sourcePath = system.pathForFile("tempVid.mov", system.DocumentsDirectory)
+
+   		file, errorString = io.open(sourcePath,"r") -- open file for reading with path
+
+		local contents = file:read("*a") -- read contents of file into contents
+
+		fname = crypto.digest(crypto.sha1, contents)
+		fname = fname .. ".mov"
+
+		f,e = ftp.put("ftp://tjw0018:".. password .."@34.230.251.252/var/www/html/profiles/"..sUser.."/videos/"..fname..";type=i",contents) --login to ftp server and upload file at given directory using binary mode (not ascii)
+
+		file:close() --close file pointer--
+
+		tcp:connect("34.230.251.252", 40001)
+		tcp:send("qrgen:/var/www/html/profiles/"..sUser.."/videos/"..fname)
+		tcp:close()
+
+		local options = {
+			effect = "slideRight",
+			time = 500
+		}
+
+		native.showAlert("SUCCESS","Your card was sent",{"OK"})
+
+		composer.removeScene("home")
+		composer.gotoScene("home",options)
+
 	end
 
 	orderBtn = widget.newButton(
@@ -158,8 +207,7 @@ function scene:create( event )
 		width = 220,
 		height = 60,
 		cornerRadius = 30,
-		fillColor = {default={211/255,211/255,211/255}, over={1,0,0.5}},
-		labelColor = {default={169/255,169/255,169/255}, over={0,0,0.5}}
+		fillColor = {default={1,1,1}, over={1,0,0.5}}
 	})
 	orderBtn.x = display.contentCenterX
 	orderBtn.y = display.contentCenterY+ 225

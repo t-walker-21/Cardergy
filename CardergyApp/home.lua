@@ -16,7 +16,7 @@ images = {}
 categories = {}
 names = {}
 tableView = nil
-
+Niall = nil
 ---------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE
 -- unless "composer.removeScene()" is called.
@@ -154,11 +154,12 @@ function scene:create( event )
    local function onRowTouch(event)
       if (event.phase == "release") then
         local row = event.row
+
         --print(tableView._view._rows[row.index])
         --[[composer.setVariable("cardStyle", images[row.index])
         composer.setvariable("cardName", names[row.index])
         composer.setVariable("cardCategory", categories[row.index])--]]
-        local Niall = Card:new({})
+        Niall = Card:new({})
         Niall:setCategory(categories[row.index])
         Niall:setBackImage(images[row.index])
         Niall:setName(names[row.index])
@@ -228,6 +229,7 @@ function scene:create( event )
       elseif ("submitted" == event.phase) then
         native.setKeyboardFocus(nil)
       elseif ("ended" == event.phase) then
+        native.setKeyboardFocus(nil)
       end
    end
 
@@ -310,16 +312,20 @@ function scene:show( event )
    local phase = event.phase
  
    if ( phase == "will" ) then
-      -- Called when the scene is still off screen (but is about to come on screen).
+      if (Niall ~= nil) then
+        Niall = nil
+      end
+
    elseif ( phase == "did" ) then
       -- Called when the scene is now on screen.
       -- Insert code here to make the scene come alive.
       -- Example: start timers, begin animation, play audio, etc.
-      --[[local options = {
-         effect = "slideLeft",
-         time = 800
-      }
-      composer.gotoScene("profile", options)--]]
+      composer.removeScene("item")
+      composer.removeScene("search")
+      composer.removeScene("message")
+      composer.removeScene("manually")
+      composer.removeScene("videoRecord")
+      composer.removeScene("order")
    end
 end
  
@@ -330,10 +336,7 @@ function scene:hide( event )
    local phase = event.phase
  
    if ( phase == "will" ) then
-      -- Called when the scene is on screen (but is about to go off screen).
-      -- Insert code here to "pause" the scene.
-      -- Example: stop timers, stop animation, stop audio, etc.
-      -- composer.setVariable("passScene", "")
+      
    elseif ( phase == "did" ) then
       -- Called immediately after scene goes off screen.
    end
