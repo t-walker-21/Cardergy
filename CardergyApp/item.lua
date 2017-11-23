@@ -88,13 +88,14 @@ function scene:create( event )
    sceneGroup:insert(topbarContainer)
 
    ---------------retrieve card image here-------------------
-   genreTxt = display.newText("Genre: Niall Sucks", display.contentCenterX, display.contentCenterY-210, native.systemFont, 24)
-   styleTxt = display.newText("Style: Niall Still Sucks", display.contentCenterX, display.contentCenterY-180, native.systemFont, 24)
+   Niall = composer.getVariable("Niall")
+   genreTxt = display.newText("Genre: "..Niall.category, display.contentCenterX, display.contentCenterY-210, native.systemFont, 24)
+   styleTxt = display.newText("Style: "..Niall.name, display.contentCenterX, display.contentCenterY-180, native.systemFont, 24)
    genreTxt.anchorX = 0
    styleTxt.anchorX = 0
    genreTxt.x = 5
    styleTxt.x = 5
-   card = display.newImageRect("start_card.png", 157, 250)
+   card = display.newImageRect(Niall.backImage, 157, 250)
    card.x = display.contentCenterX
    card.y = display.contentCenterY - 20
    sceneGroup:insert(genreTxt)

@@ -2,17 +2,38 @@ display.setStatusBar(display.DarkStatusBar)
 local composer = require( "composer" )
 local scene = composer.newScene()
 local widget = require("widget")
-local topbarContainer, topbarBackground, menuBtn, cameraBtn, topbarInsignia
+local topbarBackground, menuBtn, cameraBtn, topbarInsignia
 local host, port = "34.230.251.252", 40000
 local socket = require("socket")
 local tcp = assert(socket.tcp())
- 
+local Card = require("card")
+
+cardCategories = {"Holiday","Blessings","Birthday","Congradulations!","Invite"}
+tableFlag = false
+local parts
+rowCnt = 0
+images = {}
+categories = {}
+names = {}
+tableView = nil
+
 ---------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE
 -- unless "composer.removeScene()" is called.
 ---------------------------------------------------------------------------------
  
 -- local forward references should go here
+
+-- overlay options
+local overlayOptions = {
+	isModal = true,
+	effect = "slideRight",
+	time = 400
+}
+
+function scene:showSearch()
+   searchField.isVisible = true
+end
  
 ---------------------------------------------------------------------------------
  
@@ -23,16 +44,26 @@ function scene:create( event )
  
    -- Initialize the scene here.
    -- Example: add display objects to "sceneGroup", add touch listeners, etc.
-   topbarContainer = display.newContainer(display.contentWidth, 100)
-   topbarContainer:translate(display.contentWidth * 0.5, -5)
 
-   topbarBackground = display.newRect(display.contentCenterX, display.contentCenterY, display.contentWidth, 100)
+   -- Container for the top menu bar
+   -- topbarContainer = display.newContainer(display.contentWidth, 100)
+   -- topbarContainer:translate(display.contentWidth * 0.5, -5)
+
+   -- Background for the top menu bar
+   topbarBackground = display.newRect(display.contentCenterX, 50, display.contentWidth, 100)
    topbarBackground:setFillColor(135/255,206/255,250/255)
-   topbarContainer:insert(topbarBackground, true)
+   -- topbarContainer:insert(topbarBackground, true)
 
-   local function menuEvent(event)
+   -- Handle the menu button's touch events
+   function menuEvent(event)
+      -- hide the search bar because it's a bitch
+      searchField.isVisible = false
+      
+      -- Show the overlay in all its glory
+      composer.showOverlay("menu", overlayOptions)
    end
 
+   -- Create the menu button
    menuBtn = widget.newButton({
          width = 30,
          height = 30,
@@ -40,18 +71,21 @@ function scene:create( event )
          --overFile = "menu_pressed.png",
          onRelease = menuEvent
    })
-   topbarContainer:insert(menuBtn, true)
-   menuBtn.x = -140
-   menuBtn.y = -10
+   -- topbarContainer:insert(menuBtn, true)
+   menuBtn.x = 30
+   menuBtn.y = 40
 
-   topbarInsignia = display.newImageRect("logo_black.png", 100, 33)
-   topbarInsignia.y = -10
+   -- Cardergy logo for the top menu bar
+   topbarInsignia = display.newImageRect("logo_black.png", 128, 45)
+   topbarInsignia.x = display.contentCenterX
+   topbarInsignia.y = 40
+   -- topbarContainer:insert(topbarInsignia)
 
-   topbarContainer:insert(topbarInsignia)
-
+   -- Handle the camera button events
    local function cameraEvent(event)
    end
 
+   -- Create the camera button in the top menu bar
    cameraBtn = widget.newButton({
          width = 30,
          height = 30,
@@ -59,9 +93,9 @@ function scene:create( event )
          --overFile = "camera_pressed.png",
          onRlease = cameraEvent
    })
-   topbarContainer:insert(cameraBtn)
-   cameraBtn.x = 140
-   cameraBtn.y = -10
+   -- topbarContainer:insert(cameraBtn)
+   cameraBtn.x = 290
+   cameraBtn.y = 40
 
    string.split = function(str, pattern)
       pattern = pattern or "[^%s]+"
@@ -76,41 +110,55 @@ function scene:create( event )
       return parts
    end
 
-   local function onRowRender(event)
-      local row = event.row
 
-      local rowHeight = row.contentHeight
-      local rowWidth = row.contentWidth
-      local result = parts[row.index+1]:split()
-      local userStr = result[1]
-      rowData[row.index] = userStr
-      local firstStr = result[2]
-      local lastStr = result[3]
+   local function onRowRender( event )
+ 
+    -- Get reference to the row group
+    local row = event.row
+ 
+    -- Cache the row "contentWidth" and "contentHeight" because the row bounds can change as children objects are added
+    local rowHeight = row.contentHeight
+    local rowWidth = row.contentWidth
+ 
+    local rowTitle = display.newText( row,cardCategories[row.index], 0, 0, nil, 14 )
+    rowTitle:setFillColor( 0 )
+ 
+    -- Align the label left and vertically centered
+    rowTitle.anchorX = 0
+    rowTitle.x = 100
+    rowTitle.y = rowHeight * 0.1
 
-      userTxt = display.newText(row, userStr, 0, 0, native.systemFont, 14)
-      userTxt:setFillColor(0,0,0)
-      userTxt.anchorX = 0
-      userTxt.x = 30
-      userTxt.y = rowHeight * 0.5
-
-      nameTxt = display.newText(row, firstStr.." "..lastStr, 0, 0, native.systemFont, 14)
-      nameTxt:setFillColor(0,0,0)
-      nameTxt.anchorX = 0
-      nameTxt.x = 120
-      nameTxt.y = rowHeight * 0.5
-   end
+    --Add row image to cells
+    local imageStr = "start_card.png"
+    local rowImage = display.newImageRect(row, imageStr,50,80)
+    rowImage.x = 55
+    rowImage.y = rowHeight/2
+    images[1] = imageStr
+    categories[1] = "Holiday"
+    names[1] = "Mustache"
+  end
 
    local function onRowTouch(event)
-      local row = event.row
-      --print(tableView._view._rows[row.index])
-      composer.setVariable("recipientUser", rowData[row.index])
+      if (event.phase == "release") then
+        local row = event.row
+        --print(tableView._view._rows[row.index])
+        --[[composer.setVariable("cardStyle", images[row.index])
+        composer.setvariable("cardName", names[row.index])
+        composer.setVariable("cardCategory", categories[row.index])--]]
+        local Niall = Card:new({})
+        Niall:setCategory(categories[row.index])
+        Niall:setBackImage(images[row.index])
+        Niall:setName(names[row.index])
 
-      local options = {
-         effect = "slideLeft",
-         time = 800
-      }
+        composer.setVariable("Niall", Niall)
 
-      composer.gotoScene("message", options)
+        local options = {
+           effect = "slideLeft",
+           time = 800
+        }
+
+        composer.gotoScene("item", options)
+      end
    end
 
    local function onSearch(event)
@@ -138,7 +186,7 @@ function scene:create( event )
          end
 
          tableView = widget.newTableView({
-            height = rowCnt * 35,
+            height = 600,--rowCnt * 35,
             width = 320,
             onRowRender = onRowRender,
             onRowTouch = onRowTouch,
@@ -152,7 +200,7 @@ function scene:create( event )
             for i = 1, rowCnt do
                -- Insert a row into the tableView
                tableView:insertRow({
-                  rowHeight = 35,
+                  rowHeight = 90,
                   rowColor = {default={249/255,250/255,252/255}}
                })
             end
@@ -169,17 +217,67 @@ function scene:create( event )
       end
    end
 
+   -- Create the search bar
    searchField = native.newTextField(0, 0, 300, 30)
    searchField.inputType = "default"
    searchField:setReturnKey("done")
    searchField.placeholder = "Search for user..."
    searchField:addEventListener("userInput", onSearch)
-   topbarContainer:insert(searchField)
-   searchField.y = 30
-  
-   topbarContainer.y = 50
+   -- topbarContainer:insert(searchField)
+   searchField.x = display.contentCenterX
+   searchField.y = 80
 
-   sceneGroup:insert(topbarContainer)
+   -- Handle the scroll view events
+   local function scrollListener(event)
+   		local phase = event.phase
+   		if ( phase == "began" ) then print( "Scroll view was touched" )
+   		elseif ( phase == "moved" ) then print( "Scroll view was moved" )
+   		elseif ( phase == "ended" ) then print( "Scroll view was released" )
+   		end
+
+   		if (event.limitReached) then
+   			if (event.direction == "up") then print("Reached bottom limit")
+   			elseif (event.direction == "down") then print("Reached top limit")
+   			elseif (event.direction == "left") then print("Reached right limit")
+   			elseif (event.directoin == "right") then print("Reached left limit")
+   			end
+   		end
+
+   		return true
+   end
+
+   -- Create the scrollable view for the cards
+   local scrollView = widget.newScrollView(
+   		{
+   			top = 100,
+   			left = 0,
+   			width = 320,
+   			height = 470,
+   			scrollWidth = 300,
+   			scrollHeight = 800,
+   			listener = scrollListener
+   		}
+   )
+
+   -- Put a background in the scroll view to test functionality
+   local scrollBackground = display.newImageRect("scrollBackground.jpg", 
+      display.contentWidth, display.contentHeight)
+   scrollView:insert(scrollBackground)
+   scrollBackground.x = display.contentCenterX
+   scrollBackground.y = 285
+  
+   -- Set the topbar's position
+   -- topbarContainer.y = 50
+
+   -- Add everything to the scenegroup
+   sceneGroup:insert(scrollView)
+   sceneGroup:insert(scrollBackground)
+   sceneGroup:insert(topbarBackground)
+   sceneGroup:insert(menuBtn)
+   sceneGroup:insert(cameraBtn)
+   sceneGroup:insert(topbarInsignia)
+   sceneGroup:insert(searchField)
+   -- sceneGroup:insert(scrollBackground)
 end
  
 -- "scene:show()"
@@ -212,7 +310,7 @@ function scene:hide( event )
       -- Called when the scene is on screen (but is about to go off screen).
       -- Insert code here to "pause" the scene.
       -- Example: stop timers, stop animation, stop audio, etc.
-      composer.setVariable("passScene", "")
+      -- composer.setVariable("passScene", "")
    elseif ( phase == "did" ) then
       -- Called immediately after scene goes off screen.
    end
