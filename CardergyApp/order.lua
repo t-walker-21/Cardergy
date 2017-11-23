@@ -130,7 +130,7 @@ function scene:create( event )
 	msgField.isFontSizeScaled = false
 	msgField.text = Niall.message
 	--sceneGroup:insert(msgField)
-	rect = display.newRect(100,300,170,170)
+	rect = display.newImage("playbutt.png",170,170)
 	rect.x = display.contentCenterX + 50
 	rect.y = display.contentCenterY - 40
 	rect:addEventListener("tap",playVideo)

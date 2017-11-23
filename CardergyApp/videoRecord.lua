@@ -119,7 +119,7 @@ function scene:show( event )
       -- Called when the scene is still off screen (but is about to come on screen).
    elseif ( phase == "did" ) then
       
-      native.showAlert("make a video","touch",{"ok","no"},onComplete)--,listener=takePhoto)
+      onComplete()
    end
 
 end
