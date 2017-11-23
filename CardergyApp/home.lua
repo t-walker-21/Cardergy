@@ -19,11 +19,7 @@ local overlayOptions = {
 }
 
 function scene:showSearch()
-   -- Temp fix
    searchField.isVisible = true
-
-   -- Really need to do a transition for the search bar for making it visible
-   -- Move background and search off screen
 end
  
 ---------------------------------------------------------------------------------
@@ -140,7 +136,8 @@ function scene:create( event )
    )
 
    -- Put a background in the scroll view to test functionality
-   local scrollBackground = display.newImageRect("scrollBackground.jpg", display.contentWidth, display.contentHeight)
+   local scrollBackground = display.newImageRect("scrollBackground.jpg", 
+      display.contentWidth, display.contentHeight)
    scrollView:insert(scrollBackground)
    scrollBackground.x = display.contentCenterX
    scrollBackground.y = 285
