@@ -36,6 +36,73 @@ function scene:create( event )
  
    -- Initialize the scene here.
    -- Example: add display objects to "sceneGroup", add touch listeners, etc.
+
+   function takeVideo()
+   --c6media.captureVideo({listener = confirmVideo, destination = {baseDir=system.DocumentsDirectory,filename=fname,type="image"}})
+
+
+    media.captureVideo( { listener=processVideo,preferredQuality="high",preferredMaxDuration=5} )
+
+
+   end
+
+
+   function onComplete()
+   takeVideo()
+   end
+
+
+   function processVideo(event)
+   --ftp to server at file directory that processes qr codes
+
+
+
+--local myText = display.newText( "fetching video", 100, 200, native.systemFont, 16 )
+
+--local path = system.pathForFile(event.url,system.TemporaryDirectory) --get system (lua) Documents directory
+
+   local sourcePath = string.sub(event.url,6,-1)
+
+   
+
+   file, errorString = io.open(sourcePath,"r") -- open file for reading with path
+   
+   writePath = system.pathForFile("tempVid.mov", system.DocumentsDirectory)
+   fileWrite, errString = io.open(writePath,"w") -- open file for reading with path
+
+   Niall = composer.getVariable("Niall")
+   Niall:setVideo("tempVid.mov")
+   composer.setVariable("Niall",Niall)
+
+--local myText = display.newText( errorString, 100, 200, native.systemFont, 16 )
+
+
+local contents = file:read("*a") -- read contents of file into contents
+
+print(contents)
+fname = crypto.digest(crypto.sha1, contents)
+fname = fname .. ".mov"
+
+f,e = ftp.put("ftp://tjw0018:".. password .."@34.230.251.252/var/www/html/videos/files/"..fname..";type=i",contents) --login to ftp server and upload file at given directory using binary mode (not ascii)
+
+print(f .. "bytes written")
+
+file:close() --close file pointer--
+fileWrite:write(contents)
+fileWrite:close()
+
+print("inside process photo")
+tcp:connect("34.230.251.252", 40001)
+tcp:send("qrgen:/var/www/html/videos/files/"..fname)
+--local s, status, partial = tcp:receive()
+tcp:close()
+--print ("the data was " .. s)--]]
+
+   
+   --prevScene = composer.getSceneName("previous")
+   composer.gotoScene("order")
+   --listen to socket to determine if image contained a qr code
+end
   
 
    
@@ -52,7 +119,7 @@ function scene:show( event )
       -- Called when the scene is still off screen (but is about to come on screen).
    elseif ( phase == "did" ) then
       
-      native.showAlert("make a video","touch",{"ok","no"},onComplete)--,listener=takePhoto)
+      onComplete()
    end
 
 end
@@ -91,68 +158,6 @@ scene:addEventListener( "hide", scene )
 scene:addEventListener( "destroy", scene )
  
 ---------------------------------------------------------------------------------
-function takeVideo()
-   --c6media.captureVideo({listener = confirmVideo, destination = {baseDir=system.DocumentsDirectory,filename=fname,type="image"}})
 
-
-    media.captureVideo( { listener=processVideo,preferredQuality="high",preferredMaxDuration=5} )
-
-
-   
-end
-
-function confirmVideo(event)
-   --media.playVideo(event.url,media.RemoteSource,true,func)
-   local myText = display.newText( event.url, 100, 200, native.systemFont, 5 )
-   local function replay()
-      -- body
-   end
-end
-
-function onComplete()
-   takeVideo()
-end
-
-
-function processVideo(event)
-   --ftp to server at file directory that processes qr codes
-
-
-
---local myText = display.newText( "fetching video", 100, 200, native.systemFont, 16 )
-
---local path = system.pathForFile(event.url,system.TemporaryDirectory) --get system (lua) Documents directory
-
-local sourcePath = string.sub(event.url,6,-1)
-
-file, errorString = io.open(sourcePath,"r") -- open file for reading with path
-
---local myText = display.newText( errorString, 100, 200, native.systemFont, 16 )
-
-
-local contents = file:read("*a") -- read contents of file into contents
-
-print(contents)
-fname = crypto.digest(crypto.sha1, contents)
-fname = fname .. ".mov"
-
-f,e = ftp.put("ftp://tjw0018:".. password .."@34.230.251.252/var/www/html/videos/files/"..fname..";type=i",contents) --login to ftp server and upload file at given directory using binary mode (not ascii)
-
-print(f .. "bytes written")
-
-file:close() --close file pointer--
-
-
-print("inside process photo")
-tcp:connect("34.230.251.252", 40001)
-tcp:send("qrgen:/var/www/html/videos/files/"..fname)
---local s, status, partial = tcp:receive()
-tcp:close()
---print ("the data was " .. s)--]]
-
-
-
-   --listen to socket to determine if image contained a qr code
-end
 
 return scene

@@ -211,6 +211,12 @@ function scene:create( event )
    topbarContainer.y = 50
 
    sceneGroup:insert(topbarContainer)
+
+   local function removeKeyboard()
+     native.setKeyboardFocus(nil)
+   end
+
+   Runtime:addEventListener("tap",removeKeyboard)
 end
  
 -- "scene:show()"
