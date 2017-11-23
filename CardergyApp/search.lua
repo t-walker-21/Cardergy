@@ -130,16 +130,18 @@ function scene:create( event )
    end
 
    local function onRowTouch(event)
-      local row = event.row
-      --print(tableView._view._rows[row.index])
-      composer.setVariable("recipientUser", rowData[row.index])
+      if (event.phase == "release") then
+         local row = event.row
+         --print(tableView._view._rows[row.index])
+         composer.setVariable("recipientUser", rowData[row.index])
 
-      local options = {
-         effect = "slideLeft",
-         time = 800
-      }
+         local options = {
+            effect = "slideLeft",
+            time = 800
+         }
 
-      composer.gotoScene("message", options)
+         composer.gotoScene("message", options)
+      end
    end
 
    local function onSearch(event)

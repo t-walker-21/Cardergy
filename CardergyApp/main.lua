@@ -15,4 +15,5 @@ bg.fill = paint
 bg:toBack()
 local composer = require("composer")
 local scene = composer.newScene()
+
 composer.gotoScene("start")
