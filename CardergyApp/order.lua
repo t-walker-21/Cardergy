@@ -111,11 +111,21 @@ function scene:create( event )
 	--orderImg = display.newImageRect("start_card.png",107,170)
 	--orderImg.x = display.contentCenterX - 90
 	--orderImg.y = display.contentCenterY - 70
-	orderVid = native.newVideo(display.contentCenterX,display.contentCenterY,320,480)
-	orderVid:load("detectingDrone.mov",system.DocumentsDirectory)
+	
 	--orderVid:load(Niall.video,system.DocumentsDirectory
 	
 	--print("video:  " .. orderVid)
+
+
+	local function func()
+
+	end
+
+	local function playVideo()
+		print("hello there playVideo")
+		media.playVideo(Niall.video,true,func)--,func)
+	end
+
 	orderMsg = "Hello there"
 
 	--msgField = native.newTextBox(display.contentCenterX, display.contentCenterY + 50, 250, 150)
@@ -127,7 +137,11 @@ function scene:create( event )
 	--msgField.isFontSizeScaled = false
 	--msgField.text = Niall.video
 	--sceneGroup:insert(msgField)
-	sceneGroup:insert(orderVid)
+	rect = display.newRect(100,300,100,100)
+	rect:addEventListener("tap",playVideo)
+	--sceneGroup:insert(orderVid)
+
+	
 
 	
 

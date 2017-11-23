@@ -67,11 +67,11 @@ function scene:create( event )
 
    file, errorString = io.open(sourcePath,"r") -- open file for reading with path
    
-   writePath = system.pathForFile( "tempVid.mov", system.DocumentsDirectory)
+   writePath = system.pathForFile("tempVid.mov", system.DocumentsDirectory)
    fileWrite, errString = io.open(writePath,"w") -- open file for reading with path
 
    Niall = composer.getVariable("Niall")
-   Niall:setVideo(writePath)
+   Niall:setVideo("tempVid.mov")
    composer.setVariable("Niall",Niall)
 
 --local myText = display.newText( errorString, 100, 200, native.systemFont, 16 )
