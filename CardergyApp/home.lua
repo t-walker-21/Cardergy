@@ -8,7 +8,7 @@ local socket = require("socket")
 local tcp = assert(socket.tcp())
 local Card = require("card")
 
-cardCategories = {"Holiday","Blessings","Birthday","Congradulations!","Invite"}
+cardCategories = {"Holiday","Blessings","Birthday","Congratulations!","Invite"}
 tableFlag = false
 local parts
 rowCnt = 0
@@ -46,13 +46,13 @@ function scene:create( event )
    -- Example: add display objects to "sceneGroup", add touch listeners, etc.
 
    -- Container for the top menu bar
-   -- topbarContainer = display.newContainer(display.contentWidth, 100)
-   -- topbarContainer:translate(display.contentWidth * 0.5, -5)
+   topbarContainer = display.newContainer(display.contentWidth, 100)
+   topbarContainer:translate(display.contentWidth * 0.5, -5)
 
    -- Background for the top menu bar
    topbarBackground = display.newRect(display.contentCenterX, 50, display.contentWidth, 100)
    topbarBackground:setFillColor(135/255,206/255,250/255)
-   -- topbarContainer:insert(topbarBackground, true)
+   topbarContainer:insert(topbarBackground, true)
 
    -- Handle the menu button's touch events
    function menuEvent(event)
@@ -71,15 +71,16 @@ function scene:create( event )
          --overFile = "menu_pressed.png",
          onRelease = menuEvent
    })
-   -- topbarContainer:insert(menuBtn, true)
-   menuBtn.x = 30
-   menuBtn.y = 40
+
+   topbarContainer:insert(menuBtn, true)
+   menuBtn.x = -135
+   menuBtn.y = -4
 
    -- Cardergy logo for the top menu bar
    topbarInsignia = display.newImageRect("logo_black.png", 128, 45)
-   topbarInsignia.x = display.contentCenterX
-   topbarInsignia.y = 40
-   -- topbarContainer:insert(topbarInsignia)
+   topbarInsignia.x = 0
+   topbarInsignia.y = -10
+   topbarContainer:insert(topbarInsignia)
 
    -- Handle the camera button events
    local function cameraEvent(event)
@@ -93,9 +94,10 @@ function scene:create( event )
          --overFile = "camera_pressed.png",
          onRlease = cameraEvent
    })
-   -- topbarContainer:insert(cameraBtn)
-   cameraBtn.x = 290
-   cameraBtn.y = 40
+
+   topbarContainer:insert(cameraBtn)
+   cameraBtn.x = 135
+   cameraBtn.y = -5
 
    string.split = function(str, pattern)
       pattern = pattern or "[^%s]+"
@@ -223,9 +225,9 @@ function scene:create( event )
    searchField:setReturnKey("done")
    searchField.placeholder = "Search for user..."
    searchField:addEventListener("userInput", onSearch)
-   -- topbarContainer:insert(searchField)
-   searchField.x = display.contentCenterX
-   searchField.y = 80
+   topbarContainer:insert(searchField)
+   searchField.x = 0
+   searchField.y = 32
 
    -- Handle the scroll view events
    local function scrollListener(event)
@@ -247,36 +249,37 @@ function scene:create( event )
    end
 
    -- Create the scrollable view for the cards
-   local scrollView = widget.newScrollView(
-   		{
-   			top = 100,
-   			left = 0,
-   			width = 320,
-   			height = 470,
-   			scrollWidth = 300,
-   			scrollHeight = 800,
-   			listener = scrollListener
-   		}
-   )
+   -- local scrollView = widget.newScrollView(
+   -- 		{
+   -- 			top = 100,
+   -- 			left = 0,
+   -- 			width = 320,
+   -- 			height = 470,
+   -- 			scrollWidth = 300,
+   -- 			scrollHeight = 800,
+   -- 			listener = scrollListener
+   -- 		}
+   -- )
 
    -- Put a background in the scroll view to test functionality
-   local scrollBackground = display.newImageRect("scrollBackground.jpg", 
-      display.contentWidth, display.contentHeight)
-   scrollView:insert(scrollBackground)
-   scrollBackground.x = display.contentCenterX
-   scrollBackground.y = 285
+   -- local scrollBackground = display.newImageRect("scrollBackground.jpg", 
+   --    display.contentWidth, display.contentHeight)
+   -- scrollView:insert(scrollBackground)
+   -- scrollBackground.x = display.contentCenterX
+   -- scrollBackground.y = 285
   
    -- Set the topbar's position
-   -- topbarContainer.y = 50
+   topbarContainer.y = 50
 
    -- Add everything to the scenegroup
-   sceneGroup:insert(scrollView)
-   sceneGroup:insert(scrollBackground)
-   sceneGroup:insert(topbarBackground)
-   sceneGroup:insert(menuBtn)
-   sceneGroup:insert(cameraBtn)
-   sceneGroup:insert(topbarInsignia)
-   sceneGroup:insert(searchField)
+   -- sceneGroup:insert(scrollView)
+   -- sceneGroup:insert(scrollBackground)
+   sceneGroup:insert(topbarContainer)
+   -- sceneGroup:insert(topbarBackground)
+   -- sceneGroup:insert(menuBtn)
+   -- sceneGroup:insert(cameraBtn)
+   -- sceneGroup:insert(topbarInsignia)
+   -- sceneGroup:insert(searchField)
    -- sceneGroup:insert(scrollBackground)
 end
  
