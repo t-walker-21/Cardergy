@@ -108,36 +108,31 @@ function scene:create( event )
 	end
 
 	Niall = composer.getVariable("Niall")
-	--orderImg = display.newImageRect("start_card.png",107,170)
-	--orderImg.x = display.contentCenterX - 90
-	--orderImg.y = display.contentCenterY - 70
+	orderImg = display.newImageRect("start_card.png",107,170)
+	orderImg.x = display.contentCenterX - 90
+	orderImg.y = display.contentCenterY - 70
 	
-	--orderVid:load(Niall.video,system.DocumentsDirectory
-	
-	--print("video:  " .. orderVid)
 
-
-	local function func()
-
-	end
 
 	local function playVideo()
 		print("hello there playVideo")
-		media.playVideo(Niall.video,true,func)--,func)
+		media.playVideo(Niall.video,system.DocumentsDirectory,true)
 	end
 
 	orderMsg = "Hello there"
 
-	--msgField = native.newTextBox(display.contentCenterX, display.contentCenterY + 50, 250, 150)
-	--msgField.y = display.contentCenterY + 105
-	--msgField.inputType = "default"
-	--msgField:setReturnKey("done")
-	--msgField.isEditable = false
-	--msgField.size = 20
-	--msgField.isFontSizeScaled = false
-	--msgField.text = Niall.video
+	msgField = native.newTextBox(display.contentCenterX, display.contentCenterY + 50, 250, 150)
+	msgField.y = display.contentCenterY + 105
+	msgField.inputType = "default"
+	msgField:setReturnKey("done")
+	msgField.isEditable = false
+	msgField.size = 20
+	msgField.isFontSizeScaled = false
+	msgField.text = Niall.message
 	--sceneGroup:insert(msgField)
-	rect = display.newRect(100,300,100,100)
+	rect = display.newRect(100,300,170,170)
+	rect.x = display.contentCenterX + 50
+	rect.y = display.contentCenterY - 40
 	rect:addEventListener("tap",playVideo)
 	--sceneGroup:insert(orderVid)
 
