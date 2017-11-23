@@ -134,6 +134,7 @@ function scene:create( event )
          local row = event.row
          --print(tableView._view._rows[row.index])
          composer.setVariable("recipientUser", rowData[row.index])
+         composer.setVariable("recipientFlag", "auto")
 
          local options = {
             effect = "slideLeft",
