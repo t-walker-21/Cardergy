@@ -28,22 +28,9 @@ end
 function scene:create( event )
  
    	sceneGroup = self.view
-   	local g = display.newGroup()
 
    	-- Initialize the scene here.
    	-- Example: add display objects to "sceneGroup", add touch listeners, etc.
-	local paint = {
-	    type = "gradient",
-	    color1 = {115/255,3/255,192/255},
-	    color2 = {253/255,239/255,249/255},
-	    direction = "down"
-	}
-
-	local bg = display.newRect(display.contentCenterX, display.contentCenterY, 320, 570)
-	bg.fill = paint
-	bg:toBack()
-	sceneGroup:insert(bg)
-
 	logTxt = display.newText("Sign In", display.contentCenterX, display.contentCenterY-130, native.systemFont, 32)
 	sceneGroup:insert(logTxt)
 

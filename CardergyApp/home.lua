@@ -2,8 +2,21 @@ display.setStatusBar(display.DarkStatusBar)
 local composer = require( "composer" )
 local scene = composer.newScene()
 local widget = require("widget")
-local topbarBackground, menuBtn, cameraBtn, topbarInsignia, scrollView, searchField
- 
+local topbarBackground, menuBtn, cameraBtn, topbarInsignia
+local host, port = "34.230.251.252", 40000
+local socket = require("socket")
+local tcp = assert(socket.tcp())
+local Card = require("card")
+
+cardCategories = {"Holiday","Blessings","Birthday","Congradulations!","Invite"}
+tableFlag = false
+local parts
+rowCnt = 0
+images = {}
+categories = {}
+names = {}
+tableView = nil
+
 ---------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE
 -- unless "composer.removeScene()" is called.
@@ -84,10 +97,121 @@ function scene:create( event )
    cameraBtn.x = 290
    cameraBtn.y = 40
 
-   -- Handle the search bar's events
+   string.split = function(str, pattern)
+      pattern = pattern or "[^%s]+"
+      if pattern:len() == 0 then
+         pattern = "[^%s]+"
+      end
+      local parts = {__index = table.insert}
+      setmetatable(parts, parts)
+      str:gsub(pattern, parts)
+      setmetatable(parts, nil)
+      parts.__index = nil
+      return parts
+   end
+
+
+   local function onRowRender( event )
+ 
+    -- Get reference to the row group
+    local row = event.row
+ 
+    -- Cache the row "contentWidth" and "contentHeight" because the row bounds can change as children objects are added
+    local rowHeight = row.contentHeight
+    local rowWidth = row.contentWidth
+ 
+    local rowTitle = display.newText( row,cardCategories[row.index], 0, 0, nil, 14 )
+    rowTitle:setFillColor( 0 )
+ 
+    -- Align the label left and vertically centered
+    rowTitle.anchorX = 0
+    rowTitle.x = 100
+    rowTitle.y = rowHeight * 0.1
+
+    --Add row image to cells
+    local imageStr = "start_card.png"
+    local rowImage = display.newImageRect(row, imageStr,50,80)
+    rowImage.x = 55
+    rowImage.y = rowHeight/2
+    images[1] = imageStr
+    categories[1] = "Holiday"
+    names[1] = "Mustache"
+  end
+
+   local function onRowTouch(event)
+      if (event.phase == "release") then
+        local row = event.row
+        --print(tableView._view._rows[row.index])
+        --[[composer.setVariable("cardStyle", images[row.index])
+        composer.setvariable("cardName", names[row.index])
+        composer.setVariable("cardCategory", categories[row.index])--]]
+        local Niall = Card:new({})
+        Niall:setCategory(categories[row.index])
+        Niall:setBackImage(images[row.index])
+        Niall:setName(names[row.index])
+
+        composer.setVariable("Niall", Niall)
+
+        local options = {
+           effect = "slideLeft",
+           time = 800
+        }
+
+        composer.gotoScene("item", options)
+      end
+   end
+
    local function onSearch(event)
       if ("began" == event.phase) then
       elseif ("editing" == event.phase) then
+         if (tableFlag == false) then
+            display.remove(tableView)
+         end
+
+         tableFlag = false
+         rowData = {}
+
+         search = "search:"..searchField.text
+         tcp:connect(host, port)
+         tcp:send(search)
+         local s, status, partial = tcp:receive()
+         tcp:close()
+
+         if (s ~= nil and s ~= "") then
+               s = s:split("[^:]+")
+               rowCnt = tonumber(parts[1])
+         elseif (partial ~= nil and partial ~= "") then
+               parts = partial:split("[^:]+")
+               rowCnt = tonumber(parts[1])
+         end
+
+         tableView = widget.newTableView({
+            height = 600,--rowCnt * 35,
+            width = 320,
+            onRowRender = onRowRender,
+            onRowTouch = onRowTouch,
+            listener = scrollListener,
+         })
+         tableView.anchorY = 0
+         tableView.x = display.contentCenterX
+         tableView.y = display.contentCenterY-185
+
+         if (rowCnt > 0) then
+            for i = 1, rowCnt do
+               -- Insert a row into the tableView
+               tableView:insertRow({
+                  rowHeight = 90,
+                  rowColor = {default={249/255,250/255,252/255}}
+               })
+            end
+         end
+
+         if (searchField.text == nil or searchField.text == "") then
+            tableFlag = true
+            display.remove(tableView)
+         else
+            sceneGroup:insert(tableView)
+         end
       elseif ("submitted" == event.phase) then
       elseif ("ended" == event.phase) then
       end
@@ -97,7 +221,7 @@ function scene:create( event )
    searchField = native.newTextField(0, 0, 300, 30)
    searchField.inputType = "default"
    searchField:setReturnKey("done")
-   searchField.placeholder = "Search..."
+   searchField.placeholder = "Search for user..."
    searchField:addEventListener("userInput", onSearch)
    -- topbarContainer:insert(searchField)
    searchField.x = display.contentCenterX
