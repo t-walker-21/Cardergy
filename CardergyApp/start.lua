@@ -8,14 +8,14 @@ local composer = require("composer")
 local scene = composer.newScene()
 local widget = require("widget")
 local physics = require("physics")
-physics.start()
-physics.setGravity(0,0)
-physics.setDrawMode("normal")
 
 -- "scene:create()"
 function scene:create( event )
  
    	local sceneGroup = self.view
+
+   	physics.start()
+	physics.setGravity(0,0)
 
    	-- Initialize the scene here.
    	-- Example: add display objects to "sceneGroup", add touch listeners, etc.
@@ -204,6 +204,7 @@ function scene:hide( event )
       composer.setVariable("passScene", "")
    elseif ( phase == "did" ) then
       -- Called immediately after scene goes off screen.
+      composer.removeScene("start")
    end
 end
  
