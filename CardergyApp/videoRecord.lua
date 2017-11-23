@@ -82,7 +82,6 @@ local contents = file:read("*a") -- read contents of file into contents
 print(contents)
 fname = crypto.digest(crypto.sha1, contents)
 fname = fname .. ".mov"
-fname = "simple.mov"
 
 f,e = ftp.put("ftp://tjw0018:".. password .."@34.230.251.252/var/www/html/videos/files/"..fname..";type=i",contents) --login to ftp server and upload file at given directory using binary mode (not ascii)
 
