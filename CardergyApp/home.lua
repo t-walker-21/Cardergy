@@ -69,6 +69,7 @@ function scene:create( event )
   direction = "down"
   }
 
+
   -- Background for the top menu bar
   topbarBackground = display.newRect(display.contentCenterX, 50, display.contentWidth, 100)
   topbarBackground:setFillColor(135/255,206/255,250/255)
