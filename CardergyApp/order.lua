@@ -112,7 +112,7 @@ function scene:create( event )
 	end
 
 	Niall = composer.getVariable("Niall")
-	orderImg = display.newImageRect("start_card.png",107,170)
+	orderImg = display.newImageRect(Niall.backImage,system.TemporaryDirectory,107,170)
 	orderImg.x = display.contentCenterX - 90
 	orderImg.y = display.contentCenterY - 70
 	
