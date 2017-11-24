@@ -95,7 +95,7 @@ function scene:create( event )
    styleTxt.anchorX = 0
    genreTxt.x = 5
    styleTxt.x = 5
-   card = display.newImageRect(Niall.backImage, 157, 250)
+   card = display.newImageRect(Niall.backImage, system.TemporaryDirectory, 157, 250)
    card.x = display.contentCenterX
    card.y = display.contentCenterY - 20
    sceneGroup:insert(genreTxt)
