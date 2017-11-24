@@ -171,6 +171,7 @@ function scene:create( event )
 			composer.setVariable("recipientCity", city)
 			composer.setVariable("recipientState", state)
 			composer.setVariable("recipientZip", zip)
+			composer.setVariable("recipientFlag", "manual")
 
 			local options = {
 				effect = "slideLeft",

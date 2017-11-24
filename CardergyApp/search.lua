@@ -10,7 +10,6 @@ local rowCnt = 0
 local parts
 local tableFlag = false
 local rowData = {}
---local tableHeight = numRows * heightEachRow
  
 ---------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE
@@ -110,6 +109,7 @@ function scene:create( event )
 
       local rowHeight = row.contentHeight
       local rowWidth = row.contentWidth
+
       local result = parts[row.index+1]:split()
       local userStr = result[1]
       rowData[row.index] = userStr
@@ -119,13 +119,13 @@ function scene:create( event )
       userTxt = display.newText(row, userStr, 0, 0, native.systemFont, 14)
       userTxt:setFillColor(0,0,0)
       userTxt.anchorX = 0
-      userTxt.x = 30
+      userTxt.x = 16
       userTxt.y = rowHeight * 0.5
 
       nameTxt = display.newText(row, firstStr.." "..lastStr, 0, 0, native.systemFont, 14)
       nameTxt:setFillColor(0,0,0)
       nameTxt.anchorX = 0
-      nameTxt.x = 120
+      nameTxt.x = 130
       nameTxt.y = rowHeight * 0.5
    end
 
@@ -134,6 +134,7 @@ function scene:create( event )
          local row = event.row
          --print(tableView._view._rows[row.index])
          composer.setVariable("recipientUser", rowData[row.index])
+         composer.setVariable("recipientFlag", "auto")
 
          local options = {
             effect = "slideLeft",
@@ -154,14 +155,14 @@ function scene:create( event )
          tableFlag = false
          rowData = {}
 
-         search = "search:"..searchField.text
+         search = "search:"..searchField.text.."\n"
          tcp:connect(host, port)
          tcp:send(search)
          local s, status, partial = tcp:receive()
          tcp:close()
 
          if (s ~= nil and s ~= "") then
-               s = s:split("[^:]+")
+               parts = s:split("[^:]+")
                rowCnt = tonumber(parts[1])
          elseif (partial ~= nil and partial ~= "") then
                parts = partial:split("[^:]+")

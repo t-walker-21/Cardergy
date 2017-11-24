@@ -51,7 +51,7 @@ function scene:create( event )
 	end
 
 	local function continueEvent(event)
-   		takenStr = "taken:"..userField.text..":"..emailField.text..":"..phoneField.text
+   		takenStr = "taken:"..userField.text..":"..emailField.text..":"..phoneField.text.."\n"
    		tcp:connect(host, port)
 		tcp:send(takenStr)
    		local s, status, partial = tcp:receive()
