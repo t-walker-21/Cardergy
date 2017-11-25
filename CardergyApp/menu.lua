@@ -51,32 +51,26 @@ function scene:create(event)
 		if (event.phase == "release") then
 			if (row.index == 1) then
 				-- Home
-				print("Home button released")
 				-- Call the hide overlay
 				-- Call a gotoscene for Home
 			elseif (row.index == 2) then
 				-- Account
-				print("Account button released")
 				-- Call the hide overlay
 				-- Call a gotoscene for Account
 			elseif (row.index == 3) then
 				-- Rankings (SCRATCH THIS)
-				print("Rankings button released")
 				-- Call the hide overlay
 				-- Call a gotoscene for Rankings
 			elseif (row.index == 4) then
 				-- QR Camera
-				print("QR Camera button released")
 				-- Call the hide overlay
 				-- Call a gotoscene for QR Camera
 			elseif (row.index == 5) then
 				-- About Us
-				print("About Us button released")
 				-- Call the hide overlay
 				-- Call a gotoscene for About Us
 			elseif (row.index == 6) then
 				-- Logout functionality
-				print("Logout button released")
 				-- Call the hide overlay
 				-- Call logout function
 				-- Call a gotoscene for login
@@ -84,13 +78,8 @@ function scene:create(event)
 		end
 	end
 
-	-- Specify the scrollListener function for the menulist
-	local function scrollListener(event)
-
-	end
-
-	-- Specify the menulist options
-	local menulistOptions = {
+	-- Create the tableview
+	local menulist = widget.newTableView({
 		left = 10,
 		top = 70,
 		height = 600,
@@ -101,10 +90,7 @@ function scene:create(event)
 		isLocked = true,
 		noLines = false,
 		backgroundColor = { 0.8, 0.8, 0.8 }
-	}
-
-	-- Create the tableview
-	local menulist = widget.newTableView(menulistOptions)
+	})
 
 	-- Insert rows
 	for i = 1, 6 do
@@ -126,38 +112,28 @@ function scene:create(event)
 	userImage.width = 30
 	userImage.height = 30
 
-	-- Specify user name label options
-	local userLabelOptions = {
+	-- Add the user name label
+	local userLabel = display.newText({
 		text = "HELLO, " .. username,
 		font = native.systemFont,
 		fontSize = 18
-	}
-
-	-- Add the user name label
-	local userLabel = display.newText(userLabelOptions)
+	})
 	userLabel.anchorX = 0
 	userLabel.x = 50
-	userLabel.y = 40
+	userLabel.y = 42
 
 	-- Add close button event handler
 	local function closeButtonPressed(event)
-		if (event.phase == "ended") then
-			-- Test the button's handler
-			print("Close was pressed and released")
-
-			composer.hideOverlay("slideLeft", 400)
-		end
+		composer.hideOverlay(true, "slideLeft", 400)
 	end
 
-	-- Specify close button options
-	local closeButtonOptions = {
-		id = "closeButton",
+	-- Add the menu close button
+	local closeButton = widget.newButton({
+		width = 15,
+		height = 15,
 		onRelease = closeButtonPressed,
 		defaultFile = "close.png"
-	}
-
-	-- Add the menu close button
-	local closeButton = widget.newButton(closeButtonOptions)
+	})
 	closeButton.anchorX = 0
 	closeButton.x = 290
 	closeButton.y = 42
@@ -190,12 +166,7 @@ function scene:show(event)
       -- Called when the scene is now on screen.
       -- Insert code here to make the scene come alive.
       -- Example: start timers, begin animation, play audio, etc.
-      --[[local options = {
-         effect = "slideLeft",
-         time = 800
-      }
-      composer.gotoScene("profile", options)--]]
-   end
+    end
 end
 
 -- Hide the scene

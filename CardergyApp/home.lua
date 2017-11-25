@@ -34,22 +34,15 @@ string.split = function(str, pattern)
   parts.__index = nil
   return parts
 end
- 
--- local forward references should go here
 
--- overlay options
-local overlayOptions = {
-  isModal = true,
-  effect = "slideRight",
-  time = 400
-}
 
-function scene:showSearch()
-   searchField.isVisible = true
-end
- 
 ---------------------------------------------------------------------------------
- 
+
+function scene:showSearch(event)
+   searchField.isVisible = true
+   return
+end
+
 -- "scene:create()"
 function scene:create( event )
  
@@ -81,9 +74,15 @@ function scene:create( event )
   function menuEvent(event)
     -- hide the search bar because it's a pain
     searchField.isVisible = false
+
+    local options = {
+      isModal = true,
+      effect = "slideRight",
+      time = 400
+    }
     
     -- Show the overlay in all its glory
-    composer.showOverlay("menu", overlayOptions)
+    composer.showOverlay("menu", options)
   end
 
   -- Create the menu button
@@ -109,8 +108,6 @@ function scene:create( event )
   local function cameraEvent(event)
     composer.gotoScene("qrScanner")
   end
-
-
 
   -- Create the camera button in the top menu bar
   cameraBtn = widget.newButton({
@@ -180,6 +177,7 @@ function scene:create( event )
         Niall:setName(names[row.index])
 
         composer.setVariable("Niall", Niall)
+        native.setKeyboardFocus(nil)
 
         local options = {
            effect = "slideLeft",
@@ -317,6 +315,7 @@ scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )
 scene:addEventListener( "destroy", scene )
+scene:addEventListener( "showSearch", scene )
  
 ---------------------------------------------------------------------------------
 
