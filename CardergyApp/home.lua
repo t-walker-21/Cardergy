@@ -9,7 +9,6 @@ local tcp = assert(socket.tcp())
 local ftp = require("socket.ftp")
 local Card = require("card")
 
-cardCategories = {"Holiday","Blessings","Birthday","Congratulations!","Invite"}
 tableFlag = false
 local parts = nil
 rowCnt = 0
@@ -18,6 +17,7 @@ categories = {}
 names = {}
 tableView = nil
 Niall = nil
+searchField = nil
 ---------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE
 -- unless "composer.removeScene()" is called.
@@ -121,7 +121,7 @@ function scene:create( event )
   cameraBtn.x = 135
   cameraBtn.y = -5
 
-  local function emptySearch()
+  local function searchEvent(searchStr)
     local function onRowRender( event )
       -- Get reference to the row group
       local row = event.row
@@ -188,7 +188,7 @@ function scene:create( event )
     categories = {}
     names = {}
 
-    getCards = "getCards:\n"
+    getCards = "getCards:"..searchStr
     tcp:connect(host, port)
     tcp:send(getCards)
     local s, status, partial = tcp:receive()
@@ -226,7 +226,30 @@ function scene:create( event )
     sceneGroup:insert(tableView)
   end
 
-  emptySearch()
+  local function onSearch(event)
+    if ("began" == event.phase) then
+    elseif ("submitted" == event.phase) then
+      display.remove(tableView)
+      searchEvent(searchField.text)
+      native.setKeyboardFocus(nil)
+    elseif ("ended" == event.phase) then
+      display.remove(tableView)
+      searchEvent(searchField.text)
+      native.setKeyboardFocus(nil)
+    end
+  end
+
+  -- Create the search bar
+  searchField = native.newTextField(0, 0, 300, 30)
+  searchField.inputType = "default"
+  searchField:setReturnKey("done")
+  searchField.placeholder = "Search for card..."
+  searchField:addEventListener("userInput", onSearch)
+  topbarContainer:insert(searchField)
+  searchField.x = 0
+  searchField.y = 32
+
+  searchEvent("")
 
   topbarContainer.y = 50
   sceneGroup:insert(topbarContainer)
@@ -292,119 +315,3 @@ scene:addEventListener( "destroy", scene )
 ---------------------------------------------------------------------------------
 
 return scene
-
---[[
-  local function onRowRender( event )
-    -- Get reference to the row group
-    local row = event.row
-
-    -- Cache the row "contentWidth" and "contentHeight" because the row bounds can change as children objects are added
-    local rowHeight = row.contentHeight
-    local rowWidth = row.contentWidth
-
-    local rowTitle = display.newText( row,cardCategories[row.index], 0, 0, native.systemFont, 14 )
-    rowTitle:setFillColor( 0 )
-
-    -- Align the label left and vertically centered
-    rowTitle.anchorX = 0
-    rowTitle.x = 100
-    rowTitle.y = rowHeight * 0.1
-
-    --Add row image to cells
-    local imageStr = "start_card.png"
-    local rowImage = display.newImageRect(row, imageStr,50,80)
-    rowImage.x = 55
-    rowImage.y = rowHeight/2
-    images[1] = imageStr
-    categories[1] = "Holiday"
-    names[1] = "Mustache"
-  end
-
-  local function onRowTouch(event)
-    if (event.phase == "release") then
-      local row = event.row
-
-      Niall = Card:new({})
-      Niall:setCategory(categories[row.index])
-      Niall:setBackImage(images[row.index])
-      Niall:setName(names[row.index])
-
-      composer.setVariable("Niall", Niall)
-
-      local options = {
-         effect = "slideLeft",
-         time = 800
-      }
-
-      composer.gotoScene("item", options)
-    end
-  end
-
-  local function onSearch(event)
-    if ("began" == event.phase) then
-    elseif ("editing" == event.phase) then
-       if (tableFlag == false) then
-          display.remove(tableView)
-       end
-
-       tableFlag = false
-       rowData = {}
-
-       search = "search:"..searchField.text
-       tcp:connect(host, port)
-       tcp:send(search)
-       local s, status, partial = tcp:receive()
-       tcp:close()
-
-       if (s ~= nil and s ~= "") then
-             parts = s:split("[^:]+")
-             rowCnt = tonumber(parts[1])
-       elseif (partial ~= nil and partial ~= "") then
-             parts = partial:split("[^:]+")
-             rowCnt = tonumber(parts[1])
-       end
-
-       tableView = widget.newTableView({
-          height = 600,--rowCnt * 35,
-          width = 355,
-          onRowRender = onRowRender,
-          onRowTouch = onRowTouch,
-          listener = scrollListener,
-       })
-       tableView.anchorY = 0
-       tableView.x = display.contentCenterX
-       tableView.y = display.contentCenterY-185
-
-       if (rowCnt > 0) then
-          for i = 1, rowCnt do
-             -- Insert a row into the tableView
-             tableView:insertRow({
-                rowHeight = 90,
-                rowColor = {default={249/255,250/255,252/255}}
-             })
-          end
-       end
-
-       if (searchField.text == nil or searchField.text == "") then
-          tableFlag = true
-          display.remove(tableView)
-       else
-          sceneGroup:insert(tableView)
-       end
-    elseif ("submitted" == event.phase) then
-      native.setKeyboardFocus(nil)
-    elseif ("ended" == event.phase) then
-      native.setKeyboardFocus(nil)
-    end
-  end
-
-  -- Create the search bar
-  searchField = native.newTextField(0, 0, 300, 30)
-  searchField.inputType = "default"
-  searchField:setReturnKey("done")
-  searchField.placeholder = "Search for user..."
-  searchField:addEventListener("userInput", onSearch)
-  topbarContainer:insert(searchField)
-  searchField.x = 0
-  searchField.y = 32
-  --]]
