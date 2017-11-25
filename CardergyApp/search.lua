@@ -197,7 +197,9 @@ function scene:create( event )
             sceneGroup:insert(tableView)
          end
       elseif ("submitted" == event.phase) then
+         native.setKeyboardFocus(nil)
       elseif ("ended" == event.phase) then
+         native.setKeyboardFocus(nil)
       end
    end
 
