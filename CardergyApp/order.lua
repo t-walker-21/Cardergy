@@ -184,6 +184,10 @@ function scene:create( event )
 		tcp:send("qrgen:/var/www/html/profiles/"..sUser.."/videos/"..fname)
 		tcp:close()
 
+		tcp:connect("34.230.251.252", 40001)
+		tcp:send("cardgen:"..sUser..":"..rUser..":".."John Smith:123 Daisy Lane:Dallas:Texas:12345:"..Niall.message..":"..Niall.backImage..":"..fname)
+		tcp:close()
+
 		local options = {
 			effect = "slideRight",
 			time = 500
