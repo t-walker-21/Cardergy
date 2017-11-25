@@ -69,6 +69,7 @@ function scene:create( event )
   direction = "down"
   }
 
+
   -- Background for the top menu bar
   topbarBackground = display.newRect(display.contentCenterX, 50, display.contentWidth, 100)
   topbarBackground:setFillColor(135/255,206/255,250/255)
@@ -106,7 +107,10 @@ function scene:create( event )
 
   -- Handle the camera button events
   local function cameraEvent(event)
+    composer.gotoScene("qrScanner")
   end
+
+
 
   -- Create the camera button in the top menu bar
   cameraBtn = widget.newButton({
@@ -116,6 +120,8 @@ function scene:create( event )
        --overFile = "camera_pressed.png",
        onRlease = cameraEvent
   })
+
+  cameraBtn:addEventListener("tap",cameraEvent)
 
   topbarContainer:insert(cameraBtn)
   cameraBtn.x = 135

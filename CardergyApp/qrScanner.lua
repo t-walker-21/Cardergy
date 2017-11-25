@@ -93,7 +93,6 @@ scene:addEventListener( "destroy", scene )
 ---------------------------------------------------------------------------------
 function takePhoto()
 	media.capturePhoto({listener = processPhoto, destination = {baseDir=system.DocumentsDirectory,filename=fname,type="image"}})
-	myText = display.newText( "uploading photo...", 100, 200, native.systemFont, 16)
 end
 
 function onComplete(event)
@@ -137,7 +136,7 @@ local contents = file:read("*a") -- read contents of file into contents
 
 print(contents)
 
-
+--myText = display.newText( "uploading photo...", 100, 200, native.systemFont, 16)
 f,e = ftp.put("ftp://tjw0018:".. password .."@34.230.251.252/var/www/html/videos/codeUpload/"..fname..";type=i",contents) --login to ftp server and upload file at given directory using binary mode (not ascii)
 
 print(f .. "bytes written")

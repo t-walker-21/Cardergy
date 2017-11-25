@@ -16,4 +16,5 @@ bg:toBack()
 local composer = require("composer")
 local scene = composer.newScene()
 
-composer.gotoScene("profile")
+composer.gotoScene("start")
+

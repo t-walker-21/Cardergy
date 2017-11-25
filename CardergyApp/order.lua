@@ -112,7 +112,7 @@ function scene:create( event )
 	end
 
 	Niall = composer.getVariable("Niall")
-	orderImg = display.newImageRect("start_card.png",107,170)
+	orderImg = display.newImageRect(Niall.backImage,system.TemporaryDirectory,107,170)
 	orderImg.x = display.contentCenterX - 90
 	orderImg.y = display.contentCenterY - 70
 	
@@ -182,6 +182,10 @@ function scene:create( event )
 
 		tcp:connect("34.230.251.252", 40001)
 		tcp:send("qrgen:/var/www/html/profiles/"..sUser.."/videos/"..fname)
+		tcp:close()
+
+		tcp:connect("34.230.251.252", 40001)
+		tcp:send("cardgen:"..sUser..":"..rUser..":".."John Smith:123 Daisy Lane:Dallas:Texas:12345:"..Niall.message..":"..Niall.backImage..":"..fname)
 		tcp:close()
 
 		local options = {
