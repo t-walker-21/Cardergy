@@ -1,7 +1,21 @@
+display.setStatusBar(display.DarkStatusBar)
 local composer = require( "composer" )
 local scene = composer.newScene()
 local widget = require("widget")
+local host, port = "34.230.251.252", 40000
+local socket = require("socket")
+local tcp = assert(socket.tcp())
+local crypto = require("crypto")
+
+-------------------------Variables-----------------------------------------------
 local topbarContainer, topbarBackground, menuBtn, cameraBtn, topbarInsignia
+local i
+local rowTitle = nil
+local getProfile = ""
+local setProfile = ""
+local parts
+local errorOpts = nil
+local uname, pass, email, phone, name, street, city, state, zip
  
 ---------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE
@@ -11,11 +25,14 @@ local topbarContainer, topbarBackground, menuBtn, cameraBtn, topbarInsignia
 -- local forward references should go here
  
 ---------------------------------------------------------------------------------
- 
-function scene:showSearch(event)
-   return
+function scene:revertAlapha(field)
+   native.setKeyboardFocus(field)
 end
 
+function scene:showSearch()
+   return
+end
+ 
 -- "scene:create()"
 function scene:create( event )
  
@@ -23,39 +40,20 @@ function scene:create( event )
  
    -- Initialize the scene here.
    -- Example: add display objects to "sceneGroup", add touch listeners, etc.
-   --local user = composer.getVariable("user")
+   local user = composer.getVariable("user")
    local topbarContainer = display.newContainer(display.contentWidth, 60)
-   topbarContainer:translate(display.contentWidth * 0.5, -5)
+      topbarContainer:translate(display.contentWidth * 0.5, -5)
 
    local paint = {
-		type = "gradient",
-		color1 = {248/255,181/255,0/255},
-		color2 = {252/255,234/255,187/255},
-		direction = "down"
-	}
+      type = "gradient",
+      color1 = {248/255,181/255,0/255},
+      color2 = {252/255,234/255,187/255},
+      direction = "down"
+   }
 
    local topbarBackground = display.newRect(display.contentCenterX, display.contentCenterY, display.contentWidth, 60)
    topbarBackground.fill = paint
    topbarContainer:insert(topbarBackground, true)
-
-   local function backIcnEvent(event)
-      local options = {
-         effect = "slideRight",
-         time = 800
-      }
-      composer.gotoScene("home", options)
-   end
-
-   backIcn = widget.newButton({
-      width = 30,
-      height = 30,
-      defaultFile = "back_icon.png",
-      --overFile = "back_pressed.png"
-      onRelease = backIcnEvent
-   }) 
-   topbarContainer:insert(backIcn)
-   backIcn.x = -140
-   backIcn.y = 10
 
    local function menuEvent(event)
       local options = {
@@ -75,8 +73,8 @@ function scene:create( event )
          --overFile = "menu_pressed.png",
          onRelease = menuEvent
    })
-   topbarContainer:insert(menuBtn, true)
-   menuBtn.x = -105
+   topbarContainer:insert(menuBtn)
+   menuBtn.x = -140
    menuBtn.y = 10
 
    topbarInsignia = display.newImageRect("logo_black.png", 100, 33)
@@ -102,82 +100,6 @@ function scene:create( event )
    topbarContainer.y = 30
 
    sceneGroup:insert(topbarContainer)
-
-   ---------------retrieve card image here-------------------
-   Niall = composer.getVariable("Niall")
-   genreTxt = display.newText("Genre: "..Niall.category, display.contentCenterX, display.contentCenterY-210, native.systemFont, 24)
-   styleTxt = display.newText("Style: "..Niall.name, display.contentCenterX, display.contentCenterY-180, native.systemFont, 24)
-   genreTxt.anchorX = 0
-   styleTxt.anchorX = 0
-   genreTxt.x = 5
-   styleTxt.x = 5
-   card = display.newImageRect(Niall.backImage, system.TemporaryDirectory, 157, 250)
-   card.x = display.contentCenterX
-   card.y = display.contentCenterY - 20
-   sceneGroup:insert(genreTxt)
-   sceneGroup:insert(styleTxt)
-   sceneGroup:insert(card)
-   ----------------------------------------------------------
-
-   local function continueEvent(event)
-      local function onComplete(event)
-         local options = {
-            effect = "slideLeft",
-            time = 800
-         }
-         local i = event.index
-         if (i == 1) then
-            composer.gotoScene("search", options)
-         elseif (i == 2) then
-            composer.gotoScene("manually", options)
-         end
-      end
-
-      local alert = native.showAlert("Search or Enter Manually", "Would you like to search for your recipient or enter his or her data in manually?", {"Search", "Manually"}, onComplete)
-   end
-
-   continueBtn = widget.newButton(
-   {
-      label = "Continue",
-      fontSize = 20,
-      font = native.systemFontBold,
-      emboss = true,
-      onRelease = continueEvent,
-      shape = "roundedRect",
-      width = 220,
-      height = 60,
-      cornerRadius = 30,
-      fillColor = {default={1,1,1}, over={1,0,0.5}},
-   })
-   continueBtn.x = display.contentCenterX
-   continueBtn.y = display.contentCenterY + 165
-   sceneGroup:insert(continueBtn)
-
-   --[[
-   local function backBtnEvent(event)
-      local options = {
-         effect = "slideRight",
-         time = 800
-      }
-      composer.gotoScene("home", options)
-   end
-
-   backBtn = widget.newButton(
-   {
-      label = "Back",
-      fontSize = 20,
-      font = native.systemFontBold,
-      emboss = true,
-      onRelease = backBtnEvent,
-      shape = "roundedRect",
-      width = 220,
-      height = 60,
-      cornerRadius = 30,
-      fillColor = {default={1,1,1}, over={1,0,0.5}},
-   })
-   backBtn.x = display.contentCenterX
-   backBtn.y = display.contentCenterY + 210
-   sceneGroup:insert(backBtn)--]]
 end
  
 -- "scene:show()"
@@ -192,7 +114,6 @@ function scene:show( event )
       -- Called when the scene is now on screen.
       -- Insert code here to make the scene come alive.
       -- Example: start timers, begin animation, play audio, etc.
-      composer.removeScene("manually")
    end
 end
  

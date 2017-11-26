@@ -97,7 +97,7 @@ function scene:create( event )
          height = 30,
          defaultFile = "camera_icon.png",
          --overFile = "camera_pressed.png",
-         onRlease = cameraEvent
+         onRelease = cameraEvent
    })
    topbarContainer:insert(cameraBtn)
    cameraBtn.x = 140
