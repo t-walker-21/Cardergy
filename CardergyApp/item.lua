@@ -12,6 +12,10 @@ local topbarContainer, topbarBackground, menuBtn, cameraBtn, topbarInsignia
  
 ---------------------------------------------------------------------------------
  
+function scene:showSearch(event)
+   return
+end
+
 -- "scene:create()"
 function scene:create( event )
  
@@ -53,6 +57,17 @@ function scene:create( event )
    backIcn.x = -140
    backIcn.y = 10
 
+   local function menuEvent(event)
+      local options = {
+        isModal = true,
+        effect = "slideRight",
+        time = 400
+      }
+
+      -- Show the overlay in all its glory
+      composer.showOverlay("menu", options)
+   end
+
    menuBtn = widget.newButton({
          width = 30,
          height = 30,
@@ -70,6 +85,7 @@ function scene:create( event )
    topbarContainer:insert(topbarInsignia)
 
    local function cameraEvent(event)
+      composer.gotoScene("qrScanner")
    end
 
    cameraBtn = widget.newButton({

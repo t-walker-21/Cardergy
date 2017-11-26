@@ -8,7 +8,6 @@ local socket = require("socket")
 local tcp = assert(socket.tcp())
 local ftp = require("socket.ftp")
 local Card = require("card")
-
 tableFlag = false
 local parts = nil
 rowCnt = 0
@@ -18,6 +17,7 @@ names = {}
 tableView = nil
 Niall = nil
 searchField = nil
+
 ---------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE
 -- unless "composer.removeScene()" is called.
@@ -35,12 +35,10 @@ string.split = function(str, pattern)
   return parts
 end
 
-
 ---------------------------------------------------------------------------------
 
-function scene:showSearch(event)
+function scene:showSearch()
    searchField.isVisible = true
-   return
 end
 
 -- "scene:create()"
@@ -56,18 +54,14 @@ function scene:create( event )
   topbarContainer:translate(display.contentWidth * 0.5, -5)
 
   local paint = {
-  type = "gradient",
-  color1 = {248/255,181/255,0/255},
-  color2 = {252/255,234/255,187/255},
-  direction = "down"
+    type = "gradient",
+    color1 = {248/255,181/255,0/255},
+    color2 = {252/255,234/255,187/255},
+    direction = "down"
   }
 
-
-  -- Background for the top menu bar
-  topbarBackground = display.newRect(display.contentCenterX, 50, display.contentWidth, 100)
-  topbarBackground:setFillColor(135/255,206/255,250/255)
+  topbarBackground = display.newRect(display.contentCenterX, display.contentCenterY, display.contentWidth, 100)
   topbarBackground.fill = paint
-
   topbarContainer:insert(topbarBackground, true)
 
   -- Handle the menu button's touch events
@@ -100,7 +94,6 @@ function scene:create( event )
 
   -- Cardergy logo for the top menu bar
   topbarInsignia = display.newImageRect("logo_black.png", 100, 33)
-  topbarInsignia.x = 0
   topbarInsignia.y = -10
   topbarContainer:insert(topbarInsignia)
 
@@ -115,12 +108,10 @@ function scene:create( event )
        height = 30,
        defaultFile = "camera_icon.png",
        --overFile = "camera_pressed.png",
-       onRlease = cameraEvent
+       onRelease = cameraEvent
   })
 
-  cameraBtn:addEventListener("tap",cameraEvent)
-
-  topbarContainer:insert(cameraBtn)
+  topbarContainer:insert(cameraBtn, true)
   cameraBtn.x = 135
   cameraBtn.y = -5
 
@@ -235,11 +226,11 @@ function scene:create( event )
     elseif ("submitted" == event.phase) then
       display.remove(tableView)
       searchEvent(searchField.text)
-      native.setKeyboardFocus(nil)
+      --native.setKeyboardFocus(nil)
     elseif ("ended" == event.phase) then
       display.remove(tableView)
       searchEvent(searchField.text)
-      native.setKeyboardFocus(nil)
+      --native.setKeyboardFocus(nil)
     end
   end
 
@@ -315,7 +306,6 @@ scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )
 scene:addEventListener( "destroy", scene )
-scene:addEventListener( "showSearch", scene )
  
 ---------------------------------------------------------------------------------
 

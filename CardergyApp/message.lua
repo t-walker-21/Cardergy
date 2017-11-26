@@ -7,17 +7,21 @@ local recVidBtn = nil
 local errorOpts = nil
 local sceneGroup = nil
 local validMsg = false
+local msgField = nil
 
 function scene:revertAlpha(field)
 	--sceneGroup.alpha = 1
 	native.setKeyboardFocus(field)
 end
 
+function scene:showSearch()
+	msgField.isVisible = true
+end
+
 -- "scene:create()"
 function scene:create( event )
  
    	sceneGroup = self.view
-   	local g = display.newGroup()
 
    	-- Initialize the scene here.
    	-- Example: add display objects to "sceneGroup", add touch listeners, etc.
@@ -57,6 +61,21 @@ function scene:create( event )
    backIcn.x = -140
    backIcn.y = 10
 
+	function menuEvent(event)
+		-- hide the search bar because it's a pain
+		msgField.isVisible = false
+
+		local options = {
+		  isModal = true,
+		  effect = "slideRight",
+		  time = 400
+		}
+
+		-- Show the overlay in all its glory
+		composer.showOverlay("menu", options)
+	end
+
+
    menuBtn = widget.newButton({
          width = 30,
          height = 30,
@@ -74,6 +93,7 @@ function scene:create( event )
    topbarContainer:insert(topbarInsignia)
 
    local function cameraEvent(event)
+   	composer.gotoScene("qrScanner")
    end
 
    cameraBtn = widget.newButton({

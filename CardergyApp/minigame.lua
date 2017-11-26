@@ -10,17 +10,11 @@
 local widget = require("widget")
 local composer = require( "composer" )
 local scene = composer.newScene()
-display.setStatusBar( display.HiddenStatusBar )
 
----------------------------------------------------------------------------------
--- All code outside of the listener functions will only be executed ONCE
--- unless "composer.removeScene()" is called.
----------------------------------------------------------------------------------
- 
--- local forward references should go here
- 
----------------------------------------------------------------------------------
- 
+function scene:showSearch()
+   return
+end
+
 -- "scene:create()"
 function scene:create( event )
  
@@ -34,9 +28,69 @@ function scene:create( event )
 	bg.y = display.contentCenterY
 	bg:toFront()
 	sceneGroup:insert(bg)
+
+   local topbarContainer = display.newContainer(display.contentWidth, 60)
+      topbarContainer:translate(display.contentWidth * 0.5, -5)
+
+   local paint = {
+      type = "gradient",
+      color1 = {248/255,181/255,0/255},
+      color2 = {252/255,234/255,187/255},
+      direction = "down"
+   }
+
+   local topbarBackground = display.newRect(display.contentCenterX, display.contentCenterY, display.contentWidth, 60)
+   topbarBackground.fill = paint
+   topbarContainer:insert(topbarBackground, true)
+
+   local function menuEvent(event)
+      local options = {
+        isModal = true,
+        effect = "slideRight",
+        time = 400
+      }
+
+      -- Show the overlay in all its glory
+      composer.showOverlay("menu", options)
+   end
+
+   menuBtn = widget.newButton({
+         width = 30,
+         height = 30,
+         defaultFile = "menu_icon.png",
+         --overFile = "menu_pressed.png",
+         onRelease = menuEvent
+   })
+   topbarContainer:insert(menuBtn)
+   menuBtn.x = -140
+   menuBtn.y = 10
+
+   topbarInsignia = display.newImageRect("logo_black.png", 100, 33)
+   topbarInsignia.y = 10
+
+   topbarContainer:insert(topbarInsignia)
+
+   local function cameraEvent(event)
+      composer.gotoScene("qrScanner")
+   end
+
+   cameraBtn = widget.newButton({
+         width = 30,
+         height = 30,
+         defaultFile = "camera_icon.png",
+         --overFile = "camera_pressed.png",
+         onRlease = cameraEvent
+   })
+   topbarContainer:insert(cameraBtn)
+   cameraBtn.x = 140
+   cameraBtn.y = 10
+
+   topbarContainer.y = 30
+
+   sceneGroup:insert(topbarContainer)
    
    -- Display start scene credits
-   titleTxt = display.newText("Card Shooter", display.contentCenterX, display.contentCenterY-110, native.systemFont, 42)
+   titleTxt = display.newText("Card Wars", display.contentCenterX, display.contentCenterY-110, native.systemFont, 42)
    alexTxt = display.newText("By: Team Cardergy", display.contentCenterX, display.contentCenterY-50, native.systemFont, 28)
 
    -- Function to start the game
@@ -50,8 +104,7 @@ function scene:create( event )
    end
 
    -- Create a start button to initiate game sequence
-   local startBtn = widget.newButton(
-   {
+   local startBtn = widget.newButton({
       label = "Start",
       fontSize = 20,
       font = native.systemFontBold,

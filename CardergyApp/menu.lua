@@ -22,17 +22,17 @@ function scene:create(event)
 		local rowTitle
 
 		if (row.index == 1) then
-			rowTitle = display.newText(row, "     Home", 0, 0, nil, 15)
+			rowTitle = display.newText(row, "     Home", 0, 0, native.systemFont, 15)
 		elseif (row.index == 2) then
-			rowTitle = display.newText(row, "     Account", 0, 0, nil, 15)
+			rowTitle = display.newText(row, "     Account", 0, 0, native.systemFont, 15)
 		elseif (row.index == 3) then
-			rowTitle = display.newText(row, "     Rankings", 0, 0, nil, 15)
+			rowTitle = display.newText(row, "     QR Camera", 0, 0, native.systemFont, 15)
 		elseif (row.index == 4) then
-			rowTitle = display.newText(row, "     QR Camera", 0, 0, nil, 15)
+			rowTitle = display.newText(row, "     Minigame", 0, 0, native.systemFont, 15)
 		elseif (row.index == 5) then
-			rowTitle = display.newText(row, "     About Us", 0, 0, nil, 15)
+			rowTitle = display.newText(row, "     About Us", 0, 0, native.systemFont, 15)
 		elseif (row.index == 6) then
-			rowTitle = display.newText(row, "     Logout", 0, 0, nil, 15)
+			rowTitle = display.newText(row, "     Logout", 0, 0, native.systemFont, 15)
 		end
 
 		rowTitle:setFillColor(0.2, 0.2, 0.2)
@@ -48,32 +48,30 @@ function scene:create(event)
 		-- Get reference to the row group
 		local row = event.row
 
+		local options = {
+			effect = "slideLeft",
+			time = 800
+		}
+
 		if (event.phase == "release") then
 			if (row.index == 1) then
-				-- Home
-				-- Call the hide overlay
-				-- Call a gotoscene for Home
+				composer.hideOverlay(true, "slideLeft", 400)
+				composer.gotoScene("home", options)
 			elseif (row.index == 2) then
-				-- Account
-				-- Call the hide overlay
-				-- Call a gotoscene for Account
+				composer.hideOverlay(true, "slideLeft", 400)
+				composer.gotoScene("profile", options)
 			elseif (row.index == 3) then
-				-- Rankings (SCRATCH THIS)
-				-- Call the hide overlay
-				-- Call a gotoscene for Rankings
+				composer.hideOverlay(true, "slideLeft", 400)
+				composer.gotoScene("qrScanner", options)
 			elseif (row.index == 4) then
-				-- QR Camera
-				-- Call the hide overlay
-				-- Call a gotoscene for QR Camera
+				composer.hideOverlay(true, "slideLeft", 400)
+				composer.gotoScene("minigame", options)
 			elseif (row.index == 5) then
-				-- About Us
-				-- Call the hide overlay
-				-- Call a gotoscene for About Us
+				composer.hideOverlay(true, "slideLeft", 400)
+				composer.gotoScene("credits", options)
 			elseif (row.index == 6) then
-				-- Logout functionality
-				-- Call the hide overlay
-				-- Call logout function
-				-- Call a gotoscene for login
+				composer.hideOverlay(true, "slideLeft", 400)
+				composer.gotoScene("start", options)
 			end
 		end
 	end
@@ -129,8 +127,8 @@ function scene:create(event)
 
 	-- Add the menu close button
 	local closeButton = widget.newButton({
-		width = 15,
-		height = 15,
+		width = 40,
+		height = 40,
 		onRelease = closeButtonPressed,
 		defaultFile = "close.png"
 	})
@@ -176,12 +174,12 @@ function scene:hide(event)
    local parent = event.parent
 
    local function show(event)
-   	parent:showSearch()
+   		parent:showSearch()
    end
  
    if ( phase == "will" ) then
       -- Call any parent functions that need to happen when the overlay goes away
-      timer.performWithDelay(360, show)
+      timer.performWithDelay(280, show)
    elseif ( phase == "did" ) then
       -- Called immediately after scene goes off screen.
    end
