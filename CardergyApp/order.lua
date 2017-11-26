@@ -85,6 +85,7 @@ function scene:create( event )
    topbarContainer:insert(topbarInsignia)
 
    local function cameraEvent(event)
+   	composer.gotoScene("qrScanner")
    end
 
    cameraBtn = widget.newButton({
@@ -92,7 +93,7 @@ function scene:create( event )
          height = 30,
          defaultFile = "camera_icon.png",
          --overFile = "camera_pressed.png",
-         onRlease = cameraEvent
+         onRelease = cameraEvent
    })
    topbarContainer:insert(cameraBtn)
    cameraBtn.x = 140
@@ -200,13 +201,18 @@ function scene:create( event )
 
 		local options = {
 			effect = "slideRight",
-			time = 500
+			time = 800
 		}
 
-		native.showAlert("SUCCESS","Your card was sent",{"OK"})
+		function onComplete()
+			composer.gotoScene("home",options)
+		end
 
-		composer.removeScene("home")
-		composer.gotoScene("home",options)
+		
+
+		native.showAlert("SUCCESS","Your card was sent",{"OK"},onComplete)
+
+		
 
 	end
 
