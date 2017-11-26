@@ -45,7 +45,7 @@ function scene:create( event )
          time = 1000
       }
       -- Go to starting scene.
-      composer.gotoScene("start", options)
+      composer.gotoScene("minigame", options)
    end
 
    -- Wait 4 seconds to go to start screen
