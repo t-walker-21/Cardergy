@@ -190,6 +190,7 @@ function scene:show( event )
       composer.removeScene("register2")
       composer.removeScene("profile")
       composer.removeScene("home")
+      composer.removeScene("menu")
    end
 end
  
