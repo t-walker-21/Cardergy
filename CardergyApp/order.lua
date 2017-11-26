@@ -120,7 +120,7 @@ function scene:create( event )
 
 	Niall = composer.getVariable("Niall")
 	orderImg = display.newImageRect(Niall.backImage,system.TemporaryDirectory,107,170)
-	orderImg.x = display.contentCenterX - 90
+	orderImg.x = display.contentCenterX - 70
 	orderImg.y = display.contentCenterY - 70
 	
 
@@ -141,20 +141,23 @@ function scene:create( event )
 	msgField.text = Niall.message
 	sceneGroup:insert(msgField)
 	rect = display.newImage("playbutt.png",120,120)
-	rect.x = display.contentCenterX + 50
+	rect.x = display.contentCenterX + 60
 	rect.y = display.contentCenterY - 90
 	rect:addEventListener("tap",playVideo)
 
-	--recipient = display.newText("Recipient:" .. composer.getVariable("recipientUser"),display.contentCenterX+50, display.contentCenterY-10, native.systemFont, 17)
-
+	if (composer.getVariable("recipientFlag") == "auto") then
+		recipient = display.newText("Recipient: "..composer.getVariable("recipientUser"),display.contentCenterX+65, display.contentCenterY-10, native.systemFont, 12)
+	
+	else
+		recipient = display.newText("Recipient: "..composer.getVariable("recipientName"),display.contentCenterX+65, display.contentCenterY-10, native.systemFont, 12)
+	end
 
 	sceneGroup:insert(msgField)
 	sceneGroup:insert(rect)
 	sceneGroup:insert(orderImg)
 	sceneGroup:insert(orderTxt)
-	--sceneGroup:insert(recipient)
-	
-	
+	sceneGroup:insert(recipient)
+		
 
 	local function orderEvent(event) -- function to push card object to server and ftp video to user directory
 
@@ -170,8 +173,8 @@ function scene:create( event )
 			city = composer.getVariable("recipientCity")
 			state = composer.getVariable("recipientState")
 			zip = composer.getVariable("recipientZip")
+			
 		end
-
 		
 
 		local sourcePath = system.pathForFile("tempVid.mov", system.DocumentsDirectory)

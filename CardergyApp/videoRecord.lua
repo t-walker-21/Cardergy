@@ -50,7 +50,11 @@ function scene:create( event )
    function processVideo(event)
    --ftp to server at file directory that processes qr codes
 
-
+   if (event.completed == false) then
+      prevScene = composer.getSceneName("previous")
+      composer.gotoScene(prevScene)
+      return
+   end
 
 --local myText = display.newText( "fetching video", 100, 200, native.systemFont, 16 )
 
