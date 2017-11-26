@@ -14,6 +14,8 @@ function scene:create(event)
 	local sceneGroup = self.view
 	local parent = event.parent
 
+	username = composer.getVariable("user")
+
 	-- Specify the onRowRender function
 	local function onRowRender(event)
 		-- Get reference to the row group
@@ -164,8 +166,6 @@ function scene:show(event)
  
    if ( phase == "will" ) then
       	-- Called when the scene is still off screen (but is about to come on screen).
-      	username = composer.getVariable("user")
-
       	display.remove(scoreTxt)
 
       	scoreStr = "score:"..username.."\n"
@@ -200,7 +200,7 @@ function scene:hide(event)
  
    if ( phase == "will" ) then
       -- Call any parent functions that need to happen when the overlay goes away
-      timer.performWithDelay(280, show)
+      timer.performWithDelay(400, show)
    elseif ( phase == "did" ) then
       -- Called immediately after scene goes off screen.
    end
