@@ -10,11 +10,25 @@
 local widget = require("widget")
 local composer = require( "composer" )
 local scene = composer.newScene()
+<<<<<<< HEAD
 
 function scene:showSearch()
    return
 end
 
+=======
+display.setStatusBar( display.HiddenStatusBar )
+
+---------------------------------------------------------------------------------
+-- All code outside of the listener functions will only be executed ONCE
+-- unless "composer.removeScene()" is called.
+---------------------------------------------------------------------------------
+ 
+-- local forward references should go here
+ 
+---------------------------------------------------------------------------------
+ 
+>>>>>>> master
 -- "scene:create()"
 function scene:create( event )
  
@@ -26,6 +40,7 @@ function scene:create( event )
 	local bg = display.newImageRect("sky.png", 320, 570)
 	bg.x = display.contentCenterX
 	bg.y = display.contentCenterY
+<<<<<<< HEAD
 	bg:toFront()
 	sceneGroup:insert(bg)
 
@@ -91,6 +106,12 @@ function scene:create( event )
    
    -- Display start scene credits
    titleTxt = display.newText("Card Wars", display.contentCenterX, display.contentCenterY-110, native.systemFont, 42)
+=======
+	sceneGroup:insert(bg)
+   
+   -- Display start scene credits
+   titleTxt = display.newText("Card Shooter", display.contentCenterX, display.contentCenterY-110, native.systemFont, 42)
+>>>>>>> master
    alexTxt = display.newText("By: Team Cardergy", display.contentCenterX, display.contentCenterY-50, native.systemFont, 28)
 
    -- Function to start the game
@@ -104,7 +125,12 @@ function scene:create( event )
    end
 
    -- Create a start button to initiate game sequence
+<<<<<<< HEAD
    local startBtn = widget.newButton({
+=======
+   local startBtn = widget.newButton(
+   {
+>>>>>>> master
       label = "Start",
       fontSize = 20,
       font = native.systemFontBold,
@@ -114,7 +140,11 @@ function scene:create( event )
       width = 220,
       height = 60,
       cornerRadius = 30,
+<<<<<<< HEAD
       fillColor = {default={1,1,1}, over={1,0,0.5}},
+=======
+      fillColor = {default={1,1,1}, over={0,0,1}}
+>>>>>>> master
    })
    startBtn.x = display.contentCenterX
    startBtn.y = display.contentCenterY + 40
