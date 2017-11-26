@@ -118,7 +118,24 @@ function scene:create( event )
    jebTxt = display.newText("Jeb W.", display.contentCenterX, display.contentCenterY+20, native.systemFont, 20)
 
    dashesTxt = display.newText("-----------------------------------------------", display.contentCenterX, display.contentCenterY+50, native.systemFontBold, 20)
-   Txt = display.newText("The Cardfather:", display.contentCenterX, display.contentCenterY+90, native.systemFont, 28)
+   fatherTxt = display.newText("The Cardfather:", display.contentCenterX, display.contentCenterY+90, native.systemFont, 28)
+
+   local paint = {
+      type = "image",
+      filename = "profile_icon.png"
+   }
+   father = display.newCircle(display.contentCenterX, display.contentCenterY+180, 60)
+   father.fill = paint
+
+   sceneGroup:insert(squadTxt)
+   sceneGroup:insert(team)
+   sceneGroup:insert(alexTxt)
+   sceneGroup:insert(tevonTxt)
+   sceneGroup:insert(questionTxt)
+   sceneGroup:insert(jebTxt)
+   sceneGroup:insert(dashesTxt)
+   sceneGroup:insert(fatherTxt)
+   sceneGroup:insert(father)
 end
  
 -- "scene:show()"

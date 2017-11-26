@@ -115,7 +115,7 @@ function scene:create( event )
   cameraBtn.x = 135
   cameraBtn.y = -5
 
-  local function searchEvent(searchStr)
+  local function searchEvent()
     local function onRowRender( event )
       -- Get reference to the row group
       local row = event.row
@@ -183,7 +183,7 @@ function scene:create( event )
     categories = {}
     names = {}
 
-    getCards = "getCards:"..searchStr
+    getCards = "getCards:"..searchField.text
     tcp:connect(host, port)
     tcp:send(getCards)
     local s, status, partial = tcp:receive()
@@ -225,11 +225,11 @@ function scene:create( event )
     if ("began" == event.phase) then
     elseif ("submitted" == event.phase) then
       display.remove(tableView)
-      searchEvent(searchField.text)
+      searchEvent()
       --native.setKeyboardFocus(nil)
     elseif ("ended" == event.phase) then
       display.remove(tableView)
-      searchEvent(searchField.text)
+      searchEvent()
       --native.setKeyboardFocus(nil)
     end
   end
