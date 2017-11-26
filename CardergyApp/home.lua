@@ -183,7 +183,10 @@ function scene:create( event )
     categories = {}
     names = {}
 
-    getCards = "getCards:"..searchField.text
+    getCards = ""
+    if (searchField.text ~= nil) then
+      getCards = "getCards:"..searchField.text
+    end
     tcp:connect(host, port)
     tcp:send(getCards)
     local s, status, partial = tcp:receive()
