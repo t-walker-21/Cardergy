@@ -3,7 +3,7 @@ local scene = composer.newScene()
 local widget = require("widget")
 
 ------Change this to change the current user's name-------
-local username = "USER"
+local username = composer.getVariable("user")
 
 -- Setup the scene
 function scene:create(event)
@@ -112,7 +112,7 @@ function scene:create(event)
 
 	-- Add the user name label
 	local userLabel = display.newText({
-		text = "HELLO, " .. username,
+		text = "Hello, " .. username,
 		font = native.systemFont,
 		fontSize = 18
 	})
