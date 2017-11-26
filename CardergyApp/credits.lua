@@ -122,9 +122,9 @@ function scene:create( event )
 
    local paint = {
       type = "image",
-      filename = "profile_icon.png"
+      filename = "corona.png"
    }
-   father = display.newCircle(display.contentCenterX, display.contentCenterY+180, 60)
+   father = display.newCircle(display.contentCenterX, display.contentCenterY+180, 80)
    father.fill = paint
 
    sceneGroup:insert(squadTxt)
