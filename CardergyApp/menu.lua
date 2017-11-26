@@ -6,7 +6,7 @@ local socket = require("socket")
 local tcp = assert(socket.tcp())
 
 ------Change this to change the current user's name-------
-local username = composer.getVariable("user")
+local username = nil
 local scoreTxt = nil
 
 -- Setup the scene
@@ -59,22 +59,22 @@ function scene:create(event)
 
 		if (event.phase == "release") then
 			if (row.index == 1) then
-				composer.hideOverlay(true, "slideLeft", 400)
+				composer.hideOverlay(true, "slideLeft", 800)
 				composer.gotoScene("home", options)
 			elseif (row.index == 2) then
-				composer.hideOverlay(true, "slideLeft", 400)
+				composer.hideOverlay(true, "slideLeft", 800)
 				composer.gotoScene("profile", options)
 			elseif (row.index == 3) then
-				composer.hideOverlay(true, "slideLeft", 400)
+				composer.hideOverlay(true, "slideLeft", 800)
 				composer.gotoScene("qrScanner", options)
 			elseif (row.index == 4) then
-				composer.hideOverlay(true, "slideLeft", 400)
+				composer.hideOverlay(true, "slideLeft", 800)
 				composer.gotoScene("minigame", options)
 			elseif (row.index == 5) then
-				composer.hideOverlay(true, "slideLeft", 400)
+				composer.hideOverlay(true, "slideLeft", 800)
 				composer.gotoScene("credits", options)
 			elseif (row.index == 6) then
-				composer.hideOverlay(true, "slideLeft", 400)
+				composer.hideOverlay(true, "slideLeft", 800)
 				composer.gotoScene("start", options)
 			end
 		end
@@ -126,7 +126,7 @@ function scene:create(event)
 
 	-- Add close button event handler
 	local function closeButtonPressed(event)
-		composer.hideOverlay(true, "slideLeft", 400)
+		composer.hideOverlay(true, "slideLeft", 800)
 	end
 
 	-- Add the menu close button
@@ -164,6 +164,8 @@ function scene:show(event)
  
    if ( phase == "will" ) then
       	-- Called when the scene is still off screen (but is about to come on screen).
+      	username = composer.getVariable("user")
+
       	display.remove(scoreTxt)
 
       	scoreStr = "score:"..username.."\n"
