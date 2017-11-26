@@ -47,6 +47,7 @@ function scene:create( event )
    topbarContainer:insert(topbarBackground, true)
 
    local function backIcnEvent(event)
+      native.setKeyboardFocus(nil)
       local options = {
          effect = "slideRight",
          time = 800
@@ -69,6 +70,7 @@ function scene:create( event )
    function menuEvent(event)
       -- hide the search bar becauses it's a pain
       searchField.isVisible = false
+      native.setKeyboardFocus(nil)
 
       local options = {
          isModal = true,

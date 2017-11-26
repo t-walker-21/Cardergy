@@ -68,6 +68,7 @@ function scene:create( event )
   function menuEvent(event)
     -- hide the search bar because it's a pain
     searchField.isVisible = false
+    native.setKeyboardFocus(nil)
 
     local options = {
       isModal = true,
