@@ -1,9 +1,13 @@
 local composer = require("composer")
 local scene = composer.newScene()
 local widget = require("widget")
+local host, port = "34.230.251.252", 40000
+local socket = require("socket")
+local tcp = assert(socket.tcp())
 
 ------Change this to change the current user's name-------
 local username = composer.getVariable("user")
+local scoreTxt = nil
 
 -- Setup the scene
 function scene:create(event)
@@ -80,7 +84,7 @@ function scene:create(event)
 	local menulist = widget.newTableView({
 		left = 10,
 		top = 70,
-		height = 600,
+		height = 400,
 		width = 260,
 		onRowRender = onRowRender,
 		onRowTouch = onRowTouch,
@@ -159,11 +163,26 @@ function scene:show(event)
    local phase = event.phase
  
    if ( phase == "will" ) then
-      -- Called when the scene is still off screen (but is about to come on screen).
+      	-- Called when the scene is still off screen (but is about to come on screen).
+      	display.remove(scoreTxt)
+
+      	scoreStr = "score:"..username.."\n"
+		tcp:connect(host, port)
+		tcp:send(scoreStr)
+		local s, status, partial = tcp:receive()
+		tcp:close()
+
+		scoreTxt = display.newText("Carderger Score: "..(s or partial), 0, 0, native.systemFont, 20)
+		scoreTxt.anchorX = 0
+		scoreTxt.x = 10
+		scoreTxt.y = 520
+
+		sceneGroup:insert(scoreTxt)
+
    elseif ( phase == "did" ) then
-      -- Called when the scene is now on screen.
-      -- Insert code here to make the scene come alive.
-      -- Example: start timers, begin animation, play audio, etc.
+		-- Called when the scene is now on screen.
+		-- Insert code here to make the scene come alive.
+		-- Example: start timers, begin animation, play audio, etc.
     end
 end
 
