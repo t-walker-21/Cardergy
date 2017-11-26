@@ -10,6 +10,7 @@
 local widget = require("widget")
 local composer = require( "composer" )
 local scene = composer.newScene()
+display.setStatusBar(display.DarkStatusBar)
 
 function scene:showSearch()
    return
