@@ -10,6 +10,7 @@ local errorOpts = nil
 local sceneGroup = nil
 local validMsg = false
 local msgField = nil
+local completionSound = audio.loadSound("cardSent.m4a")
 
 password = "tevon"
 
@@ -228,7 +229,7 @@ function scene:create( event )
 		end
 
 		
-
+		completionSound:play()
 		native.showAlert("SUCCESS","Your card was sent",{"OK"},onComplete)
 
 		
