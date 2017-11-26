@@ -91,7 +91,7 @@ function scene:create( event )
          height = 30,
          defaultFile = "camera_icon.png",
          --overFile = "camera_pressed.png",
-         onRlease = cameraEvent
+         onRelease = cameraEvent
    })
    topbarContainer:insert(cameraBtn)
    cameraBtn.x = 140
@@ -240,14 +240,6 @@ function scene:create( event )
    sceneGroup:insert(topbarContainer)
    sceneGroup:insert(tableView)
    sceneGroup:insert(profileBtn)
-
-   local function backEvent(event)
-      local options = {
-         effect = "slideRight",
-         time = 800
-      }
-      composer.gotoScene("start", options)
-   end
 end
  
 -- "scene:show()"
