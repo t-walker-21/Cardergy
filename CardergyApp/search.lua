@@ -19,6 +19,10 @@ local rowData = {}
 -- local forward references should go here
  
 ---------------------------------------------------------------------------------
+
+function scene:showSearch()
+   searchField.isVisible = true
+end
  
 -- "scene:create()"
 function scene:create( event )
@@ -61,6 +65,21 @@ function scene:create( event )
    backIcn.x = -140
    backIcn.y = -10
 
+   -- Handle the menu button's touch events
+   function menuEvent(event)
+      -- hide the search bar becauses it's a pain
+      searchField.isVisible = false
+
+      local options = {
+         isModal = true,
+         effect = "slideRight",
+         time = 400
+      }
+
+      -- Show the overlay in all its glory
+      composer.showOverlay("menu", options)
+   end
+
    menuBtn = widget.newButton({
          width = 30,
          height = 30,
@@ -78,6 +97,7 @@ function scene:create( event )
    topbarContainer:insert(topbarInsignia)
 
    local function cameraEvent(event)
+      composer.gotoScene("qrScanner")
    end
 
    cameraBtn = widget.newButton({
@@ -135,6 +155,7 @@ function scene:create( event )
          --print(tableView._view._rows[row.index])
          composer.setVariable("recipientUser", rowData[row.index])
          composer.setVariable("recipientFlag", "auto")
+         native.setKeyboardFocus(nil)
 
          local options = {
             effect = "slideLeft",
@@ -221,7 +242,7 @@ function scene:create( event )
 
    Runtime:addEventListener("tap",removeKeyboard)
 end
- 
+
 -- "scene:show()"
 function scene:show( event )
  

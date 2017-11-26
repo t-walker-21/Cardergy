@@ -8,7 +8,6 @@ local socket = require("socket")
 local tcp = assert(socket.tcp())
 local ftp = require("socket.ftp")
 local Card = require("card")
-
 tableFlag = false
 local parts = nil
 rowCnt = 0
@@ -18,6 +17,7 @@ names = {}
 tableView = nil
 Niall = nil
 searchField = nil
+
 ---------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE
 -- unless "composer.removeScene()" is called.
@@ -34,22 +34,13 @@ string.split = function(str, pattern)
   parts.__index = nil
   return parts
 end
- 
--- local forward references should go here
 
--- overlay options
-local overlayOptions = {
-  isModal = true,
-  effect = "slideRight",
-  time = 400
-}
+---------------------------------------------------------------------------------
 
 function scene:showSearch()
    searchField.isVisible = true
 end
- 
----------------------------------------------------------------------------------
- 
+
 -- "scene:create()"
 function scene:create( event )
  
@@ -63,27 +54,29 @@ function scene:create( event )
   topbarContainer:translate(display.contentWidth * 0.5, -5)
 
   local paint = {
-  type = "gradient",
-  color1 = {248/255,181/255,0/255},
-  color2 = {252/255,234/255,187/255},
-  direction = "down"
+    type = "gradient",
+    color1 = {248/255,181/255,0/255},
+    color2 = {252/255,234/255,187/255},
+    direction = "down"
   }
 
-
-  -- Background for the top menu bar
-  topbarBackground = display.newRect(display.contentCenterX, 50, display.contentWidth, 100)
-  topbarBackground:setFillColor(135/255,206/255,250/255)
+  topbarBackground = display.newRect(display.contentCenterX, display.contentCenterY, display.contentWidth, 100)
   topbarBackground.fill = paint
-
   topbarContainer:insert(topbarBackground, true)
 
   -- Handle the menu button's touch events
   function menuEvent(event)
     -- hide the search bar because it's a pain
     searchField.isVisible = false
+
+    local options = {
+      isModal = true,
+      effect = "slideRight",
+      time = 400
+    }
     
     -- Show the overlay in all its glory
-    composer.showOverlay("menu", overlayOptions)
+    composer.showOverlay("menu", options)
   end
 
   -- Create the menu button
@@ -101,7 +94,6 @@ function scene:create( event )
 
   -- Cardergy logo for the top menu bar
   topbarInsignia = display.newImageRect("logo_black.png", 100, 33)
-  topbarInsignia.x = 0
   topbarInsignia.y = -10
   topbarContainer:insert(topbarInsignia)
 
@@ -110,20 +102,16 @@ function scene:create( event )
     composer.gotoScene("qrScanner")
   end
 
-
-
   -- Create the camera button in the top menu bar
   cameraBtn = widget.newButton({
        width = 30,
        height = 30,
        defaultFile = "camera_icon.png",
        --overFile = "camera_pressed.png",
-       onRlease = cameraEvent
+       onRelease = cameraEvent
   })
 
-  cameraBtn:addEventListener("tap",cameraEvent)
-
-  topbarContainer:insert(cameraBtn)
+  topbarContainer:insert(cameraBtn, true)
   cameraBtn.x = 135
   cameraBtn.y = -5
 
@@ -180,6 +168,7 @@ function scene:create( event )
         Niall:setName(names[row.index])
 
         composer.setVariable("Niall", Niall)
+        native.setKeyboardFocus(nil)
 
         local options = {
            effect = "slideLeft",
@@ -237,11 +226,11 @@ function scene:create( event )
     elseif ("submitted" == event.phase) then
       display.remove(tableView)
       searchEvent(searchField.text)
-      native.setKeyboardFocus(nil)
+      --native.setKeyboardFocus(nil)
     elseif ("ended" == event.phase) then
       display.remove(tableView)
       searchEvent(searchField.text)
-      native.setKeyboardFocus(nil)
+      --native.setKeyboardFocus(nil)
     end
   end
 

@@ -28,6 +28,10 @@ local uname, pass, email, phone, name, street, city, state, zip
 function scene:revertAlapha(field)
    native.setKeyboardFocus(field)
 end
+
+function scene:showSearch()
+   return
+end
  
 -- "scene:create()"
 function scene:create( event )
@@ -38,13 +42,28 @@ function scene:create( event )
    -- Example: add display objects to "sceneGroup", add touch listeners, etc.
    local user = composer.getVariable("user")
    local topbarContainer = display.newContainer(display.contentWidth, 60)
-   topbarContainer:translate(display.contentWidth * 0.5, -5)
+      topbarContainer:translate(display.contentWidth * 0.5, -5)
+
+   local paint = {
+      type = "gradient",
+      color1 = {248/255,181/255,0/255},
+      color2 = {252/255,234/255,187/255},
+      direction = "down"
+   }
 
    local topbarBackground = display.newRect(display.contentCenterX, display.contentCenterY, display.contentWidth, 60)
-   topbarBackground:setFillColor(135/255,206/255,250/255)
+   topbarBackground.fill = paint
    topbarContainer:insert(topbarBackground, true)
 
    local function menuEvent(event)
+      local options = {
+        isModal = true,
+        effect = "slideRight",
+        time = 400
+      }
+
+      -- Show the overlay in all its glory
+      composer.showOverlay("menu", options)
    end
 
    menuBtn = widget.newButton({
@@ -58,12 +77,13 @@ function scene:create( event )
    menuBtn.x = -140
    menuBtn.y = 10
 
-   topbarInsignia = display.newImageRect("logo_black.png", 128, 45)
+   topbarInsignia = display.newImageRect("logo_black.png", 100, 33)
    topbarInsignia.y = 10
 
    topbarContainer:insert(topbarInsignia)
 
    local function cameraEvent(event)
+      composer.gotoScene("qrScanner")
    end
 
    cameraBtn = widget.newButton({
@@ -90,16 +110,16 @@ function scene:create( event )
       onRlease = profileEvent
    })
    profileBtn.x = display.contentCenterX
-   profileBtn.y = display.contentCenterY-130
+   profileBtn.y = display.contentCenterY-135
 
    local function rowProperties(index, title, height, width)
       if (index == 1) then
          --title.anchorX = 0
-         title.x = display.contentCenterX+20
+         title.x = display.contentCenterX
          title.y = height * 0.5
       else
          title.anchorX = 0
-         title.x = 25
+         title.x = 17
          title.y = height * 0.5
       end
    end
@@ -228,23 +248,6 @@ function scene:create( event )
       }
       composer.gotoScene("start", options)
    end
-
-   --[[backBtn = widget.newButton(
-   {
-      label = "Back",
-      fontSize = 20,
-      font = native.systemFontBold,
-      emboss = true,
-      onRelease = backEvent,
-      shape = "roundedRect",
-      width = 220,
-      height = 60,
-      cornerRadius = 30,
-      fillColor = {default={1,1,1}, over={1,0,0.5}},
-   })
-   backBtn.x = display.contentCenterX
-   backBtn.y = display.contentCenterY - 200
-   sceneGroup:insert(backBtn)--]]
 end
  
 -- "scene:show()"
@@ -275,7 +278,6 @@ function scene:hide( event )
       composer.setVariable("passScene", "")
    elseif ( phase == "did" ) then
       -- Called immediately after scene goes off screen.
-      composer.removeScene("profile")
    end
 end
  

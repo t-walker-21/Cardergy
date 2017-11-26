@@ -188,6 +188,8 @@ function scene:show( event )
       -- Example: start timers, begin animation, play audio, etc.
       composer.removeScene("register1")
       composer.removeScene("register2")
+      composer.removeScene("profile")
+      composer.removeScene("home")
    end
 end
  
