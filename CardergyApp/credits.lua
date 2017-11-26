@@ -9,13 +9,6 @@ local crypto = require("crypto")
 
 -------------------------Variables-----------------------------------------------
 local topbarContainer, topbarBackground, menuBtn, cameraBtn, topbarInsignia
-local i
-local rowTitle = nil
-local getProfile = ""
-local setProfile = ""
-local parts
-local errorOpts = nil
-local uname, pass, email, phone, name, street, city, state, zip
  
 ---------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE
@@ -100,6 +93,32 @@ function scene:create( event )
    topbarContainer.y = 30
 
    sceneGroup:insert(topbarContainer)
+
+   squadTxt = display.newText("The Card-Capos:", display.contentCenterX, display.contentCenterY-190, native.systemFont, 28)
+
+   team = display.newImageRect("team.png", 250, 161)
+   team.x = display.contentCenterX
+   team.y = display.contentCenterY - 80
+
+   alexTxt = display.newText("Alex I.", display.contentCenterX-80, display.contentCenterY+20, native.systemFont, 20)
+   tevonTxt = display.newText("Tevon W.", display.contentCenterX+85, display.contentCenterY+20, native.systemFont, 20)
+
+   local paint = {
+      type = "image",
+      filename = "jeb.png"
+   }
+   questionTxt = display.newRoundedRect(display.contentCenterX, display.contentCenterY, 66, 80, 40 )
+   questionTxt.fill = paint
+   questionTxt.x = display.contentCenterX
+   questionTxt.y = display.contentCenterY-40
+   questionTxt:toFront()
+
+   --caratTxt = display.newText("^", display.contentCenterX, display.contentCenterY+16, native.systemFontBold, 40)
+   --barTxt = display.newText("|", display.contentCenterX, display.contentCenterY+16, native.systemFontBold, 40)
+   jebTxt = display.newText("Jeb W.", display.contentCenterX, display.contentCenterY+20, native.systemFont, 20)
+
+   dashesTxt = display.newText("-----------------------------------------------", display.contentCenterX, display.contentCenterY+50, native.systemFontBold, 20)
+   Txt = display.newText("The Cardfather:", display.contentCenterX, display.contentCenterY+90, native.systemFont, 28)
 end
  
 -- "scene:show()"
