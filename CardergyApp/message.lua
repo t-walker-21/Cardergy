@@ -40,6 +40,7 @@ function scene:create( event )
 	topbarContainer:insert(topbarBackground, true)
 
    local function backIcnEvent(event)
+   		native.setKeyboardFocus(nil)
    		local backScene = composer.getSceneName("previous")
 
 		local options = {
@@ -64,6 +65,7 @@ function scene:create( event )
 	function menuEvent(event)
 		-- hide the search bar because it's a pain
 		msgField.isVisible = false
+		native.setKeyboardFocus(nil)
 
 		local options = {
 		  isModal = true,
