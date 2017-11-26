@@ -9,6 +9,7 @@ local orderBtn = nil
 local errorOpts = nil
 local sceneGroup = nil
 local validMsg = false
+local msgField = nil
 
 password = "tevon"
 
@@ -22,6 +23,10 @@ rUser = "null"
 function scene:revertAlpha(field)
 	--sceneGroup.alpha = 1
 	native.setKeyboardFocus(field)
+end
+
+function scene:showSearch()
+	msgField.isVisible = true
 end
 
 -- "scene:create()"
@@ -67,6 +72,20 @@ function scene:create( event )
    topbarContainer:insert(backIcn)
    backIcn.x = -140
    backIcn.y = 10
+
+   function menuEvent(event)
+		-- hide the search bar because it's a pain
+		msgField.isVisible = false
+
+		local options = {
+		  isModal = true,
+		  effect = "slideRight",
+		  time = 400
+		}
+
+		-- Show the overlay in all its glory
+		composer.showOverlay("menu", options)
+	end
 
    menuBtn = widget.newButton({
          width = 30,
