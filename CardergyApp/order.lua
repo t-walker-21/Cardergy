@@ -196,7 +196,7 @@ function scene:create( event )
 		tcp:close()
 
 		tcp:connect("34.230.251.252", 40001)
-		tcp:send("cardgen:"..sUser..":"..rUser..":"..name..":"..address..":"..city..":"..state..":"..zip..":"..Niall.message..":"..Niall.backImage..":"..fname)
+		tcp:send("cardgen:"..sUser..":"..rUser..":"..name..":"..address..":"..city..":"..state..":"..zip..":"..Niall.message..":"..Niall.backImage..":"..Niall.category..":"..fname)
 		tcp:close()
 
 		local options = {
