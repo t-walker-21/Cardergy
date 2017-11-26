@@ -229,7 +229,7 @@ function scene:create( event )
 		end
 
 		
-		completionSound:play()
+		audio.play(completionSound)
 		native.showAlert("SUCCESS","Your card was sent",{"OK"},onComplete)
 
 		
