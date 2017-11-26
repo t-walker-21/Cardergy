@@ -12,6 +12,13 @@ local validMsg = false
 
 password = "tevon"
 
+name = "null"
+address = "null"
+city = "null"
+state = "null"
+zip = "null"
+rUser = "null"
+
 function scene:revertAlpha(field)
 	--sceneGroup.alpha = 1
 	native.setKeyboardFocus(field)
@@ -185,7 +192,7 @@ function scene:create( event )
 		tcp:close()
 
 		tcp:connect("34.230.251.252", 40001)
-		tcp:send("cardgen:"..sUser..":"..rUser..":".."John Smith:123 Daisy Lane:Dallas:Texas:12345:"..Niall.message..":"..Niall.backImage..":"..fname)
+		tcp:send("cardgen:"..sUser..":"..rUser..":"..name..":"..address..":"..city..":"..state..":"..zip..":"..Niall.message..":"..Niall.backImage..":"..fname)
 		tcp:close()
 
 		local options = {
