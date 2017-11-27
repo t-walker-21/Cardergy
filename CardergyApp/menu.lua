@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------------------
+--
+-- menu.lua
+--
+-----------------------------------------------------------------------------------------
+
 local composer = require("composer")
 local scene = composer.newScene()
 local widget = require("widget")
@@ -5,7 +11,6 @@ local host, port = "34.230.251.252", 40000
 local socket = require("socket")
 local tcp = assert(socket.tcp())
 
-------Change this to change the current user's name-------
 local username = nil
 local scoreTxt = nil
 
@@ -14,9 +19,10 @@ function scene:create(event)
 	local sceneGroup = self.view
 	local parent = event.parent
 
+	-- Get logged in user's username from composer global
 	username = composer.getVariable("user")
 
-	-- Specify the onRowRender function
+	-- Function to handle row rendering
 	local function onRowRender(event)
 		-- Get reference to the row group
 		local row = event.row
@@ -25,8 +31,9 @@ function scene:create(event)
 		local rowHeight = row.contentHeight
 		local rowWidth = row.contentWidth
 
-		local rowTitle
+		local rowTitle = nil
 
+		-- Display the text for each row rendered
 		if (row.index == 1) then
 			rowTitle = display.newText(row, "     Home", 0, 0, native.systemFont, 15)
 		elseif (row.index == 2) then
@@ -41,15 +48,14 @@ function scene:create(event)
 			rowTitle = display.newText(row, "     Logout", 0, 0, native.systemFont, 15)
 		end
 
+		-- Format the row text
 		rowTitle:setFillColor(0.2, 0.2, 0.2)
-
-		-- Align the label left and vertically centered
 		rowTitle.anchorX = 0
 		rowTitle.x = 0
 		rowTitle.y = rowHeight * 0.5
 	end
 
-	-- Specify the onRowTouch function
+	-- Function to handle pressing a row
 	local function onRowTouch(event)
 		-- Get reference to the row group
 		local row = event.row
@@ -59,6 +65,7 @@ function scene:create(event)
 			time = 800
 		}
 
+		-- Check if row has been released, and go to the corresponding scenes
 		if (event.phase == "release") then
 			if (row.index == 1) then
 				composer.hideOverlay(true, "slideLeft", 800)
@@ -82,7 +89,7 @@ function scene:create(event)
 		end
 	end
 
-	-- Create the tableview
+	-- Create the table
 	local menulist = widget.newTableView({
 		left = 10,
 		top = 70,
@@ -96,7 +103,7 @@ function scene:create(event)
 		backgroundColor = { 0.8, 0.8, 0.8 }
 	})
 
-	-- Insert rows
+	-- Insert rows into the table
 	for i = 1, 6 do
 		-- Insert a row into the tableview
 		menulist:insertRow
@@ -144,11 +151,10 @@ function scene:create(event)
 	closeButton.width = 15
 	closeButton.height = 15
 
-	-- Add a box to 'dim' the background while the overlay is active
-	-- May need to add transitioning to this
-	local backgroundDimmer = display.newRect(display.contentCenterX, 
-		display.contentCenterY, display.contentWidth, display.contentHeight)
+	-- Add a box to dim the background while the overlay is active
+	local backgroundDimmer = display.newRect(display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight)
 
+	-- Format the background dimmer
 	backgroundDimmer:setFillColor(0,0,0)
 	backgroundDimmer.alpha = 0.9
 
@@ -168,19 +174,20 @@ function scene:show(event)
       	-- Called when the scene is still off screen (but is about to come on screen).
       	display.remove(scoreTxt)
 
+      	-- Update the user score
       	scoreStr = "score:"..username.."\n"
 		tcp:connect(host, port)
 		tcp:send(scoreStr)
 		local s, status, partial = tcp:receive()
 		tcp:close()
 
+		-- Display the user's score
 		scoreTxt = display.newText("Carderger Score: "..(s or partial), 0, 0, native.systemFont, 20)
 		scoreTxt.anchorX = 0
 		scoreTxt.x = 10
 		scoreTxt.y = 520
 
 		sceneGroup:insert(scoreTxt)
-
    elseif ( phase == "did" ) then
 		-- Called when the scene is now on screen.
 		-- Insert code here to make the scene come alive.

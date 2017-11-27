@@ -143,7 +143,7 @@ scene:addEventListener( "destroy", scene )
  
 ---------------------------------------------------------------------------------
 function takePhoto()
-	media.capturePhoto({listener = processPhoto, destination = {baseDir=system.DocumentsDirectory,filename=fname,type="image"}})
+   media.capturePhoto({listener = processPhoto, destination = {baseDir=system.DocumentsDirectory,filename=fname,type="image"}})
 end
 
 function onComplete(event)
@@ -157,12 +157,12 @@ function onComplete(event)
          return
       end
    end
-	
+   
 end
 
 
 function processPhoto(event)
-	--ftp to server at file directory that processes qr codes
+   --ftp to server at file directory that processes qr codes
 
 if (event.completed == false) then
    print "i pushed cancel"
@@ -235,7 +235,7 @@ playAgainBtn.isVisible = true
 end
 
 
-	--listen to socket to determine if image contained a qr code
+   --listen to socket to determine if image contained a qr code
 end
 
 return scene

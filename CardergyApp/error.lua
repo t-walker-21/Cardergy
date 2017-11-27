@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------------------
 --
--- main.lua
+-- error.lua
 --
 -----------------------------------------------------------------------------------------
 
@@ -30,26 +30,41 @@ function scene:show( event )
       parent = event.parent
       params = event.params
 
+      -- Function to handle error completion
       local function onComplete(event)
+         -- Revert keyboard focus back to the field that triggered the error
       	parent:revertAlpha(params.errField)
+
+         -- Determine whether the erroneous scene is registration or login
       	passScene = composer.getVariable("passScene")
+
+         -- Check if erroneous scene is registration
       	if (passScene == "regScene") then
+            -- Remove registration text and back button
       		regTxt = composer.getVariable("regTxt")
       		backBtn = composer.getVariable("backBtn")
       		display.remove(regTxt)
       		display.remove(backBtn)
+
+            -- Go to start scene
       		local options = {
       			effect = "slideRight",
       			time = 800
       		}
       		composer.gotoScene("start", options)
+
+         -- Check if erroneous scene is login
       	elseif (passScene == "logScene") then
+            -- Go to login scene
       		local options = {
       			effect = "slideLeft",
       			time = 800
       		}
       		composer.gotoScene("home", options)
+
+         -- Check if erroroneous scene is some other scene
       	else
+            -- Go to current scene
 	      	currScene = composer.getSceneName("current")
 	      	composer.gotoScene(currScene)
 	     end

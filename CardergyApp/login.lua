@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------------------
 --
--- main.lua
+-- login.lua
 --
 -----------------------------------------------------------------------------------------
 
@@ -20,6 +20,7 @@ local emptyUser,emptyPass = false
 local userField, passField = nil
 local loading = nil
 
+-- Function to set the keyboard focus back to the field that triggered the error
 function scene:revertAlpha(field)
 	--sceneGroup.alpha = 1
 	native.setKeyboardFocus(field)
@@ -32,9 +33,11 @@ function scene:create( event )
 
    	-- Initialize the scene here.
    	-- Example: add display objects to "sceneGroup", add touch listeners, etc.
+   	-- Create the login text
 	logTxt = display.newText("Sign In", display.contentCenterX, display.contentCenterY-130, native.systemFont, 32)
 	sceneGroup:insert(logTxt)
 
+	-- Function to handle an error change
 	local function changeError(f, t, s)
 		errOpts = {
 			isModal = true,
@@ -48,24 +51,30 @@ function scene:create( event )
 		}
 	end
 
+	-- Function to handle the login
 	local function loginEvent(event)
+		-- Store username and password
 		user = userField.text
 		pass = crypto.digest(crypto.sha1, passField.text)
 		logStr = "login:"..user..":"..pass.."\n"
 		composer.setVariable("logStr", logStr)
 		composer.setVariable("pass", "")
 
+		-- Send the username and password to the database for verification
 		tcp:connect(host, port)
 		tcp:send(logStr)
    		local s, status, partial = tcp:receive()
    		tcp:close()
 
+   		-- Check if the login is invalid
    		if (s == "login_incorrect" or partial == "login_incorrect") then
    			changeError(nil, "ERROR", "Username or password was incorrect.")
    			composer.showOverlay("error", errOpts)
+   		-- Check if the login failed
    		elseif (s == "login_fail" or partial == "login_fail") then
    			changeError(nil, "ERROR", "Database problem. Try again later.")
 			composer.showOverlay("error", errOpts)
+		-- Check if the login succeeded
    		else
    			composer.setVariable("passScene", "logScene")
    			composer.setVariable("user", user)
@@ -107,13 +116,16 @@ function scene:create( event )
 			--loading:removeSelf()
 
 		end
-
-		--transition.moveTo(sceneGroup, {x=display.contentCenterX, y=display.contentCenterY-100})
 	end
 
+	-- Validate the user input
 	local function validateInput()
+		-- Remove the login button
 		display.remove(loginBtn)
-		if (emptyUser == true and emptyPass) then
+
+		-- Check if the username and password fields are not empty
+		if (emptyUser == true and emptyPass == true) then
+			-- Enable the login button
 			loginBtn = widget.newButton(
 			{
 				label = "Login",
@@ -131,7 +143,9 @@ function scene:create( event )
 			loginBtn.y = display.contentCenterY + 60
 			loginBtn:setEnabled(true)
 			sceneGroup:insert(loginBtn)
+		-- Check if the username and password fields are empty
 		else
+			-- Disable the login button 
 			loginBtn = widget.newButton(
 			{
 				label = "Login",
@@ -153,11 +167,14 @@ function scene:create( event )
 		end
 	end
 
+	-- Function to handle editing the username field
 	local function onUser(event)
 		if ("began" == event.phase) then
+		-- Check if the username field is being edited
 		elseif ("editing" == event.phase) then
 			emptyUser = false
 			validateInput()
+		-- Check if the username field has been submitted
 		elseif ("submitted" == event.phase) then
 	   		if (userField.text ~= "") then
 				emptyUser = true
@@ -168,6 +185,7 @@ function scene:create( event )
 			end
 
 			native.setKeyboardFocus(passField)
+		-- Check if editing the username field has been ended
 		elseif ("ended" == event.phase) then
 	   		if (userField.text ~= "") then
 				emptyUser = true
@@ -179,11 +197,14 @@ function scene:create( event )
 		end
 	end
 
+	-- Function to handle editing the password field
 	local function onPass(event)
 		if ("began" == event.phase) then
+		-- Check if password field is being edited
 		elseif ("editing" == event.phase) then
 			emptyPass = false
 			validateInput()
+		-- Check if password field has been submitted
 		elseif ("submitted" == event.phase) then
 			if (passField.text ~= "") then
 				emptyPass = true
@@ -194,6 +215,7 @@ function scene:create( event )
 			end
 
 			native.setKeyboardFocus(confirmField)
+		-- Check if editing the password field has ended
 		elseif ("ended" == event.phase) then
 			if (passField.text ~= "") then
 				emptyPass = true
@@ -205,12 +227,14 @@ function scene:create( event )
 		end
 	end
 
+	-- Create the username field
 	userField = native.newTextField(display.contentCenterX, display.contentCenterY-60, 240, 30)
 	userField.inputType = "default"
 	userField:setReturnKey("done")
 	userField.placeholder = "Username"
 	userField:addEventListener("userInput", onUser)
 
+	-- Create the password field
 	passField = native.newTextField(display.contentCenterX, display.contentCenterY-20, 240, 30)
 	passField.inputType = "default"
 	passField:setReturnKey("done")
@@ -221,6 +245,7 @@ function scene:create( event )
 	sceneGroup:insert(userField)
 	sceneGroup:insert(passField)
 
+	-- Create the login button
 	loginBtn = widget.newButton(
 	{
 		label = "Login",
@@ -240,7 +265,9 @@ function scene:create( event )
 	loginBtn:setEnabled(false)
 	sceneGroup:insert(loginBtn)
 
+	-- Function to handle going back to the start scene
 	local function backEvent(event)
+		-- Go to the start scene
 		local options = {
 			effect = "slideRight",
 			time = 800
@@ -248,6 +275,7 @@ function scene:create( event )
 		composer.gotoScene("start", options)
 	end
 
+	-- Create the back button
 	backBtn = widget.newButton(
 	{
 		label = "Back",
@@ -265,10 +293,12 @@ function scene:create( event )
 	backBtn.y = display.contentCenterY + 135
 	sceneGroup:insert(backBtn)
 
+	-- Function to handle removing the keyboard if runtime is pressed
 	local function removeKeyboard()
 		native.setKeyboardFocus(nil)
 	end
 
+	-- Add event listener for removing keyboard when runtime is preessed
 	Runtime:addEventListener("tap", removeKeyboard)
 end
  

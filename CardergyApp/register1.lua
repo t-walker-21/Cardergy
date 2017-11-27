@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------------------
 --
--- main.lua
+-- register1.lua
 --
 -----------------------------------------------------------------------------------------
 
@@ -21,6 +21,7 @@ local previous = false
 local emptyUser,emptyPass,emptyConfirm,emptyEmail,emptyPhone = false
 local userField, passField, confirmField, emailField, phoneField = nil
 
+-- Function to revert to field that triggered the error
 function scene:revertAlpha(field)
 	--sceneGroup.alpha = 1
 	native.setKeyboardFocus(field)
@@ -34,9 +35,11 @@ function scene:create( event )
 
    	-- Initialize the scene here.
    	-- Example: add display objects to "sceneGroup", add touch listeners, etc.
+   	-- Display registration text
 	regTxt = display.newText("Registration", display.contentCenterX, display.contentCenterY-200, native.systemFont, 32)
 	sceneGroup:insert(regTxt)
 
+	-- Function to change the error
 	local function changeError(f, t, s)
 		errOpts = {
 			isModal = true,
@@ -50,13 +53,16 @@ function scene:create( event )
 		}
 	end
 
+	-- Function to continue with the registration
 	local function continueEvent(event)
+		-- Send username, email, and phone to server to verify they have not been used before
    		takenStr = "taken:"..userField.text..":"..emailField.text..":"..phoneField.text.."\n"
    		tcp:connect(host, port)
 		tcp:send(takenStr)
    		local s, status, partial = tcp:receive()
    		tcp:close()
    		
+   		-- Check all user input
    		if (s == "user_taken" or partial == "user_taken") then
 			changeError(userField, "ERROR", "Username has already been taken.")
 			composer.showOverlay("error", errOpts)
@@ -102,16 +108,16 @@ function scene:create( event )
 			--sceneGroup.alpha = 0.5
 			changeError(phoneField, "ERROR", "Phone number must be exactly 10 digits in length.")
 			composer.showOverlay("error", errOpts)
+		-- Check if user input is all valid
 		else
+			-- Store user's registration info
 			user = userField.text
 			pass = crypto.digest(crypto.sha1, passField.text)
 			email = emailField.text
 			phone = phoneField.text
 			regStr1 = "register:"..user..":"..pass..":"..email..":"..phone..":"
 			composer.setVariable("regStr1", regStr1)
-			
-			--transition.moveTo(sceneGroup, {x=display.contentCenterX, y=display.contentCenterY-100})
-			
+
 			if (previous == false) then
 				sceneGroup:remove(regTxt)
 				g:insert(regTxt)
@@ -122,17 +128,20 @@ function scene:create( event )
 			composer.setVariable("regTxt", regTxt)
 			composer.setVariable("backBtn", backBtn)
 
+			-- Go to second registration scene
 			local options = {
 				effect = "slideLeft",
 				time = 800
 			}
-
 			composer.gotoScene("register2", options)
 		end
 	end
 
+	-- Validate user input
 	local function validateInput()
 		display.remove(continueBtn)
+
+		-- Check if user input is not empty
 		if (emptyUser == true and emptyPass == true and emptyConfirm == true and emptyEmail == true and emptyPhone == true) then
 			continueBtn = widget.newButton(
 			{
@@ -151,6 +160,7 @@ function scene:create( event )
 			continueBtn.y = display.contentCenterY + 115
 			continueBtn:setEnabled(true)
 			sceneGroup:insert(continueBtn)
+		-- Check if user input is empty
 		else
 			continueBtn = widget.newButton(
 			{
@@ -173,6 +183,7 @@ function scene:create( event )
 		end
 	end
 
+	-- Function for editing username field
 	local function onUser(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
@@ -199,6 +210,7 @@ function scene:create( event )
 		end
 	end
 
+	-- Function for editing password field
 	local function onPass(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
@@ -225,6 +237,7 @@ function scene:create( event )
 		end
 	end
 
+	-- Function for editing confirm password field
 	local function onConfirm(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
@@ -251,6 +264,7 @@ function scene:create( event )
 		end
 	end
 
+	-- Function for editing email field
 	local function onEmail(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
@@ -277,6 +291,7 @@ function scene:create( event )
 		end
 	end
 
+	-- Function for editing phone field
 	local function onPhone(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
@@ -303,12 +318,14 @@ function scene:create( event )
 		end
 	end
 
+	-- Create the username field
 	userField = native.newTextField(display.contentCenterX, display.contentCenterY-130, 240, 30)
 	userField.inputType = "default"
 	userField:setReturnKey("done")
 	userField.placeholder = "Username"
 	userField:addEventListener("userInput", onUser)
 
+	-- Create the password field
 	passField = native.newTextField(display.contentCenterX, display.contentCenterY-90, 240, 30)
 	passField.inputType = "default"
 	passField:setReturnKey("done")
@@ -316,6 +333,7 @@ function scene:create( event )
 	passField.placeholder = "Password"
 	passField:addEventListener("userInput", onPass)
 
+	-- Create the confirm password field
 	confirmField = native.newTextField(display.contentCenterX, display.contentCenterY-50, 240, 30)
 	confirmField.inputType = "default"
 	confirmField:setReturnKey("done")
@@ -323,12 +341,14 @@ function scene:create( event )
 	confirmField.placeholder = "Confirm Password"
 	confirmField:addEventListener("userInput", onConfirm)
 
+	-- Create the email field
 	emailField = native.newTextField(display.contentCenterX, display.contentCenterY-10, 240, 30)
 	emailField.inputType = "default"
 	emailField:setReturnKey("done")
 	emailField.placeholder = "Email"
 	emailField:addEventListener("userInput", onEmail)
 
+	-- Create the phone field
 	phoneField = native.newTextField(display.contentCenterX, display.contentCenterY+30, 240, 30)
 	phoneField.inputType = "default"
 	phoneField:setReturnKey("done")
@@ -341,6 +361,7 @@ function scene:create( event )
 	sceneGroup:insert(emailField)
 	sceneGroup:insert(phoneField)
 
+	-- Create the continue button
 	continueBtn = widget.newButton(
 	{
 		label = "Continue",
@@ -360,23 +381,34 @@ function scene:create( event )
 	continueBtn:setEnabled(false)
 	sceneGroup:insert(continueBtn)
 
+	-- Function to handle going back to the previous scene
 	local function backEvent(event)
+		-- Go to the previous scene
 		local options = {
 			effect = "slideRight",
 			time = 800
 		}
+
 		back = composer.getVariable("back")
+
+		-- Check if going back means going to start scene
 		if (back == 1) then
 			sceneGroup:insert(backBtn)
 			sceneGroup:insert(regTxt)
 			previous = false
+
+			-- Go to start scene
 			composer.gotoScene("start", options)
+		-- Check if going back means going to first registration scene
 		else
 			previous = true
+
+			-- Go to first registration scene
 			composer.gotoScene("register1", options)
 		end
 	end
 
+	-- Create the back button
 	backBtn = widget.newButton(
 	{
 		label = "Back",
@@ -394,10 +426,12 @@ function scene:create( event )
 	backBtn.y = display.contentCenterY + 190
 	sceneGroup:insert(backBtn)
 
+	-- Function to remove the keyboard from screen after runtime is pressed
 	local function removeKeyboard()
 		native.setKeyboardFocus(nil)
 	end
 
+	-- Add event listener for removing keyboard from scene after runtime is pressed
 	Runtime:addEventListener("tap", removeKeyboard)
 end
  
