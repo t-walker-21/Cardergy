@@ -21,7 +21,7 @@ categories = {}
 names = {}
 tableView = nil
 Niall = nil
-searchField = nil
+homeSearchField = nil
 
 -- String object function to split a string by a certian delimiter
 string.split = function(str, pattern)
@@ -39,7 +39,7 @@ end
 
 -- Function to show the search field
 function scene:showSearch()
-   searchField.isVisible = true
+   homeSearchField.isVisible = true
 end
 
 -- "scene:create()"
@@ -68,7 +68,7 @@ function scene:create( event )
   -- Function to handle when the menu button is pressed
   function menuEvent(event)
     -- Hide the search bar and remove the keyboard
-    searchField.isVisible = false
+    homeSearchField.isVisible = false
     native.setKeyboardFocus(nil)
 
     -- Show the menu overlay
@@ -99,7 +99,7 @@ function scene:create( event )
 
   -- Function to handle pressing the camera button
   local function cameraEvent(event)
-    searchField.isVisible = false
+    homeSearchField.isVisible = false
     -- Go to the camera scene
     composer.gotoScene("qrScanner")
   end
@@ -202,7 +202,7 @@ function scene:create( event )
     names = {}
 
     -- Grab cards from database
-    getCards = "getCards:"..searchField.text
+    getCards = "getCards:"..homeSearchField.text
     tcp:connect(host, port)
     tcp:send(getCards)
     local s, status, partial = tcp:receive()
@@ -262,14 +262,14 @@ function scene:create( event )
   end
 
   -- Create the search bar
-  searchField = native.newTextField(0, 0, 300, 30)
-  searchField.inputType = "default"
-  searchField:setReturnKey("done")
-  searchField.placeholder = "Search for card..."
-  searchField:addEventListener("userInput", onSearch)
-  topbarContainer:insert(searchField)
-  searchField.x = 0
-  searchField.y = 32
+  homeSearchField = native.newTextField(0, 0, 300, 30)
+  homeSearchField.inputType = "default"
+  homeSearchField:setReturnKey("done")
+  homeSearchField.placeholder = "Search for card..."
+  homeSearchField:addEventListener("userInput", onSearch)
+  topbarContainer:insert(homeSearchField)
+  homeSearchField.x = 0
+  homeSearchField.y = 32
 
   -- Default table search when first going to home scene
   searchEvent("")
@@ -293,7 +293,7 @@ function scene:show( event )
   local phase = event.phase
   
   if (phase == "will") then
-    searchField.isVisible = true
+    homeSearchField.isVisible = true
   elseif ( phase == "did" ) then
     -- Called when the scene is now on screen.
     -- Insert code here to make the scene come alive.
