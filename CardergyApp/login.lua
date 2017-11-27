@@ -18,6 +18,7 @@ local errOpts = nil
 local sceneGroup = nil
 local emptyUser,emptyPass = false
 local userField, passField = nil
+local loading = nil
 
 -- Function to set the keyboard focus back to the field that triggered the error
 function scene:revertAlpha(field)
@@ -78,7 +79,42 @@ function scene:create( event )
    			composer.setVariable("passScene", "logScene")
    			composer.setVariable("user", user)
    			changeError(nil, "SUCCESS", "Login successful.")
+   			--sprite
+
+		local options = --options table containing frames for fish
+		{
+		  frames = {
+		      -- tail frames
+		      {x = 0, y = 0, width = 100, height  = 100},
+		      {x = 0, y = 125, width = 100, height  = 100},
+		      {x = 0, y = 250, width = 100, height  = 100},
+		      {x = 0, y = 375, width = 100, height  = 100},
+		      {x = 150, y = 0, width = 100, height  = 100},
+		      {x = 150, y = 125, width = 100, height  = 100},
+		      {x = 150, y = 250, width = 100, height  = 100},
+		      {x = 150, y = 375, width = 100, height  = 100},
+		    }
+		}
+
+		local sheet = graphics.newImageSheet("sprite2.png", options) --image sheet for frames
+
+		seqData = --sequence for each body part
+		{
+		  {name = "one", frames = {1,2,3,4,5,6,7,8}, time = 1000, loopCount = 0},
+		  
+		}
+
+		loading = display.newSprite(sceneGroup,sheet, seqData)
+		loading.isVisible = true
+		loading:setSequence("one")
+		loading:play()
+		loading.x = display.contentCenterX
+		loading.y = display.contentCenterY + 220
+
+		--sprite
 			composer.showOverlay("error", errOpts)
+			--loading:removeSelf()
+
 		end
 	end
 
@@ -292,6 +328,10 @@ function scene:hide( event )
       -- Called when the scene is on screen (but is about to go off screen).
       -- Insert code here to "pause" the scene.
       -- Example: stop timers, stop animation, stop audio, etc.
+      if loading ~= nil then 
+      		loading.isVisible = false
+      end
+
    elseif ( phase == "did" ) then
       -- Called immediately after scene goes off screen.
       composer.setVariable("passScene", "")
