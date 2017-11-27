@@ -1,8 +1,3 @@
------------------------------------------------------------------------------------------
---
--- qrScanner.lua
---
------------------------------------------------------------------------------------------
 
 local composer = require( "composer" )
 local scene = composer.newScene()
@@ -16,76 +11,34 @@ fname = "temp5.jpg"
 
 myText = nil
 
-function takePhoto()
-	media.capturePhoto({listener = processPhoto, destination = {baseDir=system.DocumentsDirectory,filename=fname,type="image"}})
+
+--f,e = ftp.put("ftp://tjw0018:".. password .."@34.240.251.252/var/www/html/videos/codeUpload/temp.jpg;type=i") --login to ftp server and fetch file at given directory using binary mode (not ascii)
+
+--reading from file and sending to FTP server
+
+function goBack()
+   prevScene = composer.getSceneName("previous")
+   composer.removeScene("qrScanner")
+   composer.gotoScene(prevScene)
 end
 
-function onComplete(event)
-   if event.action == "clicked" then
-      local i = event.index
-      if i == 2 then
-         takePhoto()
-      else
-         prevScene = composer.getSceneName("previous")
-         composer.gotoScene(prevScene)
-         return
-      end
-   end
+
+function playDownloadedVideo()
+
+media.playVideo("downloadedFile.mov",system.DocumentsDirectory,true) -- play video from documents directory
+
+return
 end
 
-function processPhoto(event)
-	--ftp to server at file directory that processes qr codes
-
-	if (event.completed == false) then
-	   print "i pushed cancel"
-	   prevScene = composer.getSceneName("previous")
-	   composer.gotoScene(prevScene)
-	   return
-	end
-
-	local path = system.pathForFile(fname,system.DocumentsDirectory) --get system (lua) Documents directory
-
-	file, errorString = io.open(path,"r") -- open file for reading with path
-
-	local contents = file:read("*a") -- read contents of file into contents
-
-	print(contents)
-
-	--myText = display.newText( "uploading photo...", 100, 200, native.systemFont, 16)
-	f,e = ftp.put("ftp://tjw0018:".. password .."@34.230.251.252/var/www/html/videos/codeUpload/"..fname..";type=i",contents) --login to ftp server and upload file at given directory using binary mode (not ascii)
-
-	print(f .. "bytes written")
-
-	file:close() --close file pointer--
-	--myText = nil
-	--myText = display.newText( "contacting server..", 100, 200, native.systemFont, 16 )
-	print("inside process photo")
-	tcp:connect("34.230.251.252", 40001)
-	tcp:send("qrgrab:/var/www/html/videos/codeUpload/"..fname)
-	local s, status, partial = tcp:receive()
-	tcp:close()
-	print ("the data was " .. (s or partial))
-
-	if (s == "error" or partial == "error") then
-	   native.showAlert("Qr Error","The picture you sent had no code",{"Quit","Retry"},onComplete)--,listener=takePhoto)
-	else
-		f,e = ftp.get("ftp://tjw0018:".. password .."@34.230.251.252".. (s or partial) ..";type=i") --login to ftp server and fetch file at given directory using binary mode (not ascii)
-
-		local path = system.pathForFile( "downloadedFile.mov",system.DocumentsDirectory) --get system (lua) Documents directory
-
-		-- Open the file handle
-		local file, errorString = io.open( path, "w" ) -- open file for writing with path
-
-		file:write(f) --write ftp data to file
-
-		file:close() --close file
-
-		media.playVideo("downloadedFile.mov",system.DocumentsDirectory,true) -- play video from documents directory
-
-		prevScene = composer.getSceneName("previous")
-		composer.gotoScene(prevScene)
-	end
-end
+ 
+---------------------------------------------------------------------------------
+-- All code outside of the listener functions will only be executed ONCE
+-- unless "composer.removeScene()" is called.
+---------------------------------------------------------------------------------
+ 
+-- local forward references should go here
+ 
+---------------------------------------------------------------------------------
  
 -- "scene:create()"
 function scene:create( event )
@@ -94,6 +47,50 @@ function scene:create( event )
  
    -- Initialize the scene here.
    -- Example: add display objects to "sceneGroup", add touch listeners, etc.
+  
+   takePhoto()
+
+   playAgainBtn = widget.newButton(
+         {
+            label = "Play Again",
+            fontSize = 20,
+            font = native.systemFontBold,
+            emboss = true,
+            onRelease = playDownloadedVideo,
+            shape = "roundedRect",
+            width = 220,
+            height = 60,
+            cornerRadius = 30,
+            fillColor = {default={1,1,1}, over={1,0,0.5}}
+         })
+
+         playAgainBtn.x = display.contentCenterX
+         playAgainBtn.y = display.contentCenterY + 60
+         sceneGroup:insert(playAgainBtn)
+
+
+          backBtn = widget.newButton(
+         {
+            label = "Go Back",
+            fontSize = 20,
+            font = native.systemFontBold,
+            emboss = true,
+            onRelease = goBack,
+            shape = "roundedRect",
+            width = 220,
+            height = 60,
+            cornerRadius = 30,
+            fillColor = {default={1,1,1}, over={1,0,0.5}}
+         })
+
+         backBtn.x = display.contentCenterX
+         backBtn.y = display.contentCenterY + 130
+         sceneGroup:insert(backBtn)
+   
+         backBtn.isVisible = false
+         playAgainBtn.isVisible = false
+
+
 end
  
 -- "scene:show()"
@@ -105,8 +102,10 @@ function scene:show( event )
    if ( phase == "will" ) then
       -- Called when the scene is still off screen (but is about to come on screen).
    elseif ( phase == "did" ) then
-      takePhoto()
+      
+      
    end
+
 end
  
 -- "scene:hide()"
@@ -143,5 +142,100 @@ scene:addEventListener( "hide", scene )
 scene:addEventListener( "destroy", scene )
  
 ---------------------------------------------------------------------------------
+function takePhoto()
+   media.capturePhoto({listener = processPhoto, destination = {baseDir=system.DocumentsDirectory,filename=fname,type="image"}})
+end
+
+function onComplete(event)
+   if event.action == "clicked" then
+      local i = event.index
+      if i == 2 then
+         takePhoto()
+      else
+         prevScene = composer.getSceneName("previous")
+         composer.gotoScene(prevScene)
+         return
+      end
+   end
+   
+end
+
+
+function processPhoto(event)
+   --ftp to server at file directory that processes qr codes
+
+if (event.completed == false) then
+   print "i pushed cancel"
+   prevScene = composer.getSceneName("previous")
+   composer.gotoScene(prevScene)
+   return
+end
+
+
+
+local path = system.pathForFile(fname,system.DocumentsDirectory) --get system (lua) Documents directory
+
+
+
+file, errorString = io.open(path,"r") -- open file for reading with path
+
+
+
+
+
+local contents = file:read("*a") -- read contents of file into contents
+
+print(contents)
+
+--myText = display.newText( "uploading photo...", 100, 200, native.systemFont, 16)
+f,e = ftp.put("ftp://tjw0018:".. password .."@34.230.251.252/var/www/html/videos/codeUpload/"..fname..";type=i",contents) --login to ftp server and upload file at given directory using binary mode (not ascii)
+
+print(f .. "bytes written")
+
+file:close() --close file pointer--
+--myText = nil
+--myText = display.newText( "contacting server..", 100, 200, native.systemFont, 16 )
+print("inside process photo")
+tcp:connect("34.230.251.252", 40001)
+tcp:send("qrgrab:/var/www/html/videos/codeUpload/"..fname)
+local s, status, partial = tcp:receive()
+tcp:close()
+print ("the data was " .. (s or partial))
+
+if (s == "error" or partial == "error") then
+
+   native.showAlert("Qr Error","The picture you sent had no code",{"Quit","Retry"},onComplete)--,listener=takePhoto)
+
+else
+
+f,e = ftp.get("ftp://tjw0018:".. password .."@34.230.251.252".. (s or partial) ..";type=i") --login to ftp server and fetch file at given directory using binary mode (not ascii)
+
+local path = system.pathForFile( "downloadedFile.mov",system.DocumentsDirectory) --get system (lua) Documents directory
+
+ 
+-- Open the file handle
+local file, errorString = io.open( path, "w" ) -- open file for writing with path
+
+file:write(f) --write ftp data to file
+
+
+file:close() --close file
+file = nil
+
+playDownloadedVideo()
+backBtn.isVisible = true
+playAgainBtn.isVisible = true
+
+
+
+         
+
+
+
+end
+
+
+   --listen to socket to determine if image contained a qr code
+end
 
 return scene
