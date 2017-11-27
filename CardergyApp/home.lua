@@ -99,6 +99,7 @@ function scene:create( event )
 
   -- Function to handle pressing the camera button
   local function cameraEvent(event)
+    searchField.isVisible = false
     -- Go to the camera scene
     composer.gotoScene("qrScanner")
   end
@@ -292,6 +293,7 @@ function scene:show( event )
   local phase = event.phase
   
   if (phase == "will") then
+    searchField.isVisible = true
   elseif ( phase == "did" ) then
     -- Called when the scene is now on screen.
     -- Insert code here to make the scene come alive.
