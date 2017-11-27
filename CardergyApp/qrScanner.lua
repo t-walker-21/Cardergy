@@ -16,19 +16,10 @@ myText = nil
 
 --reading from file and sending to FTP server
 
-function goBack()
-   prevScene = composer.getSceneName("previous")
-   composer.removeScene("qrScanner")
-   composer.gotoScene(prevScene)
-end
 
 
-function playDownloadedVideo()
 
-media.playVideo("downloadedFile.mov",system.DocumentsDirectory,true) -- play video from documents directory
 
-return
-end
 
  
 ---------------------------------------------------------------------------------
@@ -44,6 +35,20 @@ end
 function scene:create( event )
  
    local sceneGroup = self.view
+
+
+   function goBack()
+      prevScene = composer.getSceneName("previous")
+      composer.gotoScene(prevScene)
+   end
+
+
+   function playDownloadedVideo()
+
+      media.playVideo("downloadedFile.mov",system.DocumentsDirectory,true) -- play video from documents directory
+
+      return
+   end
 
    function takePhoto()
    media.capturePhoto({listener = processPhoto, destination = {baseDir=system.DocumentsDirectory,filename=fname,type="image"}})
