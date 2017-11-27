@@ -250,11 +250,13 @@ function scene:create( event )
       -- Reset the table
       display.remove(tableView)
       searchEvent()
+      native.setKeyboardFocus(nil)
     -- Check if searching has ended
     elseif ("ended" == event.phase) then
       -- Reset the table
       display.remove(tableView)
       searchEvent()
+      native.setKeyboardFocus(nil)
     end
   end
 
