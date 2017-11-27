@@ -2,9 +2,6 @@
 --
 -- Enemy.lua
 --
--- Name: Alex Indihar
--- Assigment: Homework 4
--- Date: 11/19/2017
 -----------------------------------------------------------------------------------------
 
 local soundTable=require("soundTable");

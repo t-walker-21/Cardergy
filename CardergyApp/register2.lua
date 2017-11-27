@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------------------
+--
+-- register2.lua
+--
+-----------------------------------------------------------------------------------------
+
 local socket = require("socket")
 local composer = require("composer")
 local scene = composer.newScene()
@@ -16,6 +22,7 @@ local validName,validAddress,validCity,validState,validZip = false
 local nameField, addressField, cityField, stateField, zipField = nil
 local states = {"California", "Alabama", "Arkansas", "Arizona", "Alaska", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"};
 
+-- Function to revert to field that triggered the error
 function scene:revertAlpha(field)
 	--sceneGroup.alpha = 1
 	native.setKeyboardFocus(field)
@@ -28,6 +35,7 @@ function scene:create( event )
 
    	-- Initialize the scene here.
    	-- Example: add display objects to "sceneGroup", add touch listeners, etc.
+   	-- Function to change the error
 	local function changeError(f, t, s)
 		errOpts = {
 			isModal = true,
@@ -41,6 +49,7 @@ function scene:create( event )
 		}
 	end
 
+	-- Function to submit the registration
 	local function submitEvent(event)
 		for i=1,50 do
 			if (states[i] == stateField.text) then
@@ -49,6 +58,7 @@ function scene:create( event )
 			end
 		end	
 
+		-- Check all user input
 		if (not(string.match(nameField.text, "^[%u][%l]* [%u][%l]*$"))) then
 			----sceneGroup.alpha = 0.5
 			changeError(nameField, "ERROR", "Name must be entered as \"First Last\" without the quotes.")
@@ -93,7 +103,9 @@ function scene:create( event )
 			--sceneGroup.alpha = 0.5
 			changeError(zipField, "ERROR", "Zip code must be exactly 5 digits in length.")
 			composer.showOverlay("error", errOpts)
+		-- Check that user input is valid
 		else
+			-- Store registration info
 			name = nameField.text
 			address = addressField.text
 			city = cityField.text
@@ -103,14 +115,17 @@ function scene:create( event )
 			regStr2 = name..":"..address..":"..city..":"..state..":"..zip.."\n"
 			composer.setVariable("regStr1", regStr1)
 			
+			-- Send registration info to server to be added to the database
 			tcp:connect(host, port)
 			tcp:send(regStr1..regStr2)
 		   	local s, status, partial = tcp:receive()
 		   	tcp:close()
 
+		   	-- Check if registration failed
 			if (s == "register_fail" or partial == "register_fail") then
 				changeError(nil, "ERROR", "Database problem. Try again later.")
 				composer.showOverlay("error", errOpts)
+			-- Check if registration succeeded
 			else
 				composer.setVariable("passScene", "regScene")
 				changeError(nil, "SUCCESS", "Registration successful.")
@@ -122,8 +137,11 @@ function scene:create( event )
 		--transition.moveTo(sceneGroup, {x=display.contentCenterX, y=display.contentCenterY-100})
 	end
 
+	-- Function to validate user input
 	local function validateInput()
 		display.remove(submitBtn)
+
+		-- Check if all input fields are not empty
 		if (validName == true and validAddress == true and validCity == true and validState == true and validZip == true) then
 			submitBtn = widget.newButton(
 			{
@@ -142,6 +160,7 @@ function scene:create( event )
 			submitBtn.y = display.contentCenterY + 115
 			submitBtn:setEnabled(true)
 			sceneGroup:insert(submitBtn)
+		-- Check if all input fields are empty
 		else
 			submitBtn = widget.newButton(
 			{
@@ -164,6 +183,7 @@ function scene:create( event )
 		end
 	end
 
+	-- Function for editing name
 	local function onName(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
@@ -190,6 +210,7 @@ function scene:create( event )
 		end
 	end
 
+	-- Functin for editing street address
 	local function onAddress(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
@@ -216,6 +237,7 @@ function scene:create( event )
 		end
 	end
 
+	-- Function for editing the city
 	local function onCity(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
@@ -242,6 +264,7 @@ function scene:create( event )
 		end
 	end
 
+	-- Function for editing the state
 	local function onState(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
@@ -268,6 +291,7 @@ function scene:create( event )
 		end
 	end
 
+	-- Function for editing the zip code
 	local function onZip(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
@@ -294,30 +318,35 @@ function scene:create( event )
 		end
 	end
 
+	-- Create the name field
 	nameField = native.newTextField(display.contentCenterX, display.contentCenterY-130, 240, 30)
 	nameField.inputType = "default"
 	nameField:setReturnKey("done")
 	nameField.placeholder = "Name: First Last"
 	nameField:addEventListener("userInput", onName)
 
+	-- Create the street address field
 	addressField = native.newTextField(display.contentCenterX, display.contentCenterY-90, 240, 30)
 	addressField.inputType = "default"
 	addressField:setReturnKey("done")
 	addressField.placeholder = "Street Address"
 	addressField:addEventListener("userInput", onAddress)
 
+	-- Create the city field
 	cityField = native.newTextField(display.contentCenterX, display.contentCenterY-50, 240, 30)
 	cityField.inputType = "default"
 	cityField:setReturnKey("done")
 	cityField.placeholder = "City"
 	cityField:addEventListener("userInput", onCity)
 
+	-- Create the state field
 	stateField = native.newTextField(display.contentCenterX, display.contentCenterY-10, 240, 30)
 	stateField.inputType = "default"
 	stateField:setReturnKey("done")
 	stateField.placeholder = "State"
 	stateField:addEventListener("userInput", onState)
 
+	-- Create the zip code field
 	zipField = native.newTextField(display.contentCenterX, display.contentCenterY+30, 240, 30)
 	zipField.inputType = "default"
 	zipField:setReturnKey("done")
@@ -330,6 +359,7 @@ function scene:create( event )
 	sceneGroup:insert(stateField)
 	sceneGroup:insert(zipField)
 
+	-- Create the submit button
 	submitBtn = widget.newButton(
 	{
 		label = "Submit",
@@ -349,10 +379,12 @@ function scene:create( event )
 	submitBtn:setEnabled(true)
 	sceneGroup:insert(submitBtn)
 
+	-- Function to handle removing the keyboard from the screen after the runtime is pressed
 	local function removeKeyboard()
 		native.setKeyboardFocus(nil)
 	end
 
+	-- Add event listener for removing the keyboard from the screen after runtime is pressed
 	Runtime:addEventListener("tap", removeKeyboard)
 end
 
