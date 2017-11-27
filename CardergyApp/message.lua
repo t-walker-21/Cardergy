@@ -13,7 +13,7 @@ local recVidBtn = nil
 local errorOpts = nil
 local sceneGroup = nil
 local validMsg = false
-local msgField = nil
+local customMsgField = nil
 
 -- Function to handle reverting back to the field that triggered the error
 function scene:revertAlpha(field)
@@ -23,7 +23,7 @@ end
 
 -- Function to show the message field
 function scene:showSearch()
-	msgField.isVisible = true
+	customMsgField.isVisible = true
 end
 
 -- "scene:create()"
@@ -77,7 +77,7 @@ function scene:create( event )
    	-- Function to handle the menu button being pressed
 	function menuEvent(event)
 		-- Hide the message field 
-		msgField.isVisible = false
+		customMsgField.isVisible = false
 
 		-- Remove the keyboard from the screen
 		native.setKeyboardFocus(nil)
@@ -110,7 +110,7 @@ function scene:create( event )
 
    -- Function to handle pressing the camera button
    local function cameraEvent(event)
-   	msgField.isVisible = false
+   	customMsgField.isVisible = false
    	-- Go to the QR scanner scene
    	composer.gotoScene("qrScanner")
    end
@@ -152,14 +152,14 @@ function scene:create( event )
 	-- Function to handle going to the recording video scene
 	local function recVidEvent(event)
 		-- Validate message input
-		if (string.len(msgField.text) > 1200) then
+		if (string.len(customMsgField.text) > 1200) then
 			----sceneGroup.alpha = 0.5
-			changeError(msgField, "ERROR", "Message has gone over the 1200 character limit.")
+			changeError(customMsgField, "ERROR", "Message has gone over the 1200 character limit.")
 			composer.showOverlay("error", errOpts)
 		-- Check if valid input has been used
 		else
 			-- Store the message
-			msg = msgField.text
+			msg = customMsgField.text
 			
 			-- Set the message on the global card object
 			Niall = composer.getVariable("Niall")
@@ -231,7 +231,7 @@ function scene:create( event )
 			validMsg = false
 			validateInput()
 		elseif ("submitted" == event.phase) then
-			if (msgField.text ~= "") then
+			if (customMsgField.text ~= "") then
 				validMsg = true
 				validateInput()
 			else
@@ -241,7 +241,7 @@ function scene:create( event )
 
 			native.setKeyboardFocus(nil)
 		elseif ("ended" == event.phase) then
-			if (msgField.text ~= "") then
+			if (customMsgField.text ~= "") then
 				validMsg = true
 				validateInput()
 			else
@@ -252,16 +252,16 @@ function scene:create( event )
 	end
 
 	-- Create the message field
-	msgField = native.newTextBox(display.contentCenterX, display.contentCenterY, 300, 300)
-	msgField.inputType = "default"
-	--msgField:setReturnKey("done")
-	msgField.placeholder = "Write a message to your\nselected recipient..."
-	msgField.isEditable = true
-	msgField.size = 20
-	msgField.isFontSizeScaled = false
-	msgField:addEventListener("userInput", onMsg)
+	customMsgField = native.newTextBox(display.contentCenterX, display.contentCenterY, 300, 300)
+	customMsgField.inputType = "default"
+	--customMsgField:setReturnKey("done")
+	customMsgField.placeholder = "Write a message to your\nselected recipient..."
+	customMsgField.isEditable = true
+	customMsgField.size = 20
+	customMsgField.isFontSizeScaled = false
+	customMsgField:addEventListener("userInput", onMsg)
 
-	sceneGroup:insert(msgField)
+	sceneGroup:insert(customMsgField)
 
 	-- Create the video record button
 	recVidBtn = widget.newButton(
@@ -300,7 +300,7 @@ function scene:show( event )
  
    if ( phase == "will" ) then
       -- Called when the scene is still off screen (but is about to come on screen).
-      msgField.isVisible = true
+      customMsgField.isVisible = true
    elseif ( phase == "did" ) then
       -- Called when the scene is now on screen.
       -- Insert code here to make the scene come alive.

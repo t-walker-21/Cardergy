@@ -15,7 +15,7 @@ local orderBtn = nil
 local errorOpts = nil
 local sceneGroup = nil
 local validMsg = false
-local msgField = nil
+local orderMsgField = nil
 local completionSound = audio.loadSound("cardSent.m4a")
 
 password = "tevon"
@@ -35,7 +35,7 @@ end
 
 -- Function to show the message field
 function scene:showSearch()
-	msgField.isVisible = true
+	orderMsgField.isVisible = true
 end
 
 -- "scene:create()"
@@ -87,7 +87,7 @@ function scene:create( event )
    -- Function to handle the menu button being pressed
    function menuEvent(event)
 		-- Hide the message field
-		msgField.isVisible = false
+		orderMsgField.isVisible = false
 
 		-- Show the side menu
 		local options = {
@@ -118,7 +118,7 @@ function scene:create( event )
    -- Function to handle going to the QR scanner
    local function cameraEvent(event)
    	-- Go to te QR scanner
-   	msgField.isVisible = false
+   	orderMsgField.isVisible = false
    	composer.gotoScene("qrScanner")
    end
 
@@ -170,15 +170,15 @@ function scene:create( event )
 	end
 
 	-- Create the message field
-	msgField = native.newTextBox(display.contentCenterX, display.contentCenterY + 50, 250, 150)
-	msgField.y = display.contentCenterY + 105
-	msgField.inputType = "default"
-	msgField:setReturnKey("done")
-	msgField.isEditable = false
-	msgField.size = 20
-	msgField.isFontSizeScaled = false
-	msgField.text = Niall.message
-	sceneGroup:insert(msgField)
+	orderMsgField = native.newTextBox(display.contentCenterX, display.contentCenterY + 50, 250, 150)
+	orderMsgField.y = display.contentCenterY + 105
+	orderMsgField.inputType = "default"
+	orderMsgField:setReturnKey("done")
+	orderMsgField.isEditable = false
+	orderMsgField.size = 20
+	orderMsgField.isFontSizeScaled = false
+	orderMsgField.text = Niall.message
+	sceneGroup:insert(orderMsgField)
 
 	-- Display the play button to play the card object's stored video
 	rect = display.newImage("playbutt.png",120,120)
@@ -195,7 +195,7 @@ function scene:create( event )
 		recipient = display.newText("Recipient: "..composer.getVariable("recipientName"),display.contentCenterX+65, display.contentCenterY-10, native.systemFont, 12)
 	end
 
-	sceneGroup:insert(msgField)
+	sceneGroup:insert(orderMsgField)
 	sceneGroup:insert(rect)
 	sceneGroup:insert(orderImg)
 	sceneGroup:insert(orderTxt)
@@ -299,7 +299,7 @@ function scene:show( event )
  
    if ( phase == "will" ) then
       -- Called when the scene is still off screen (but is about to come on screen).
-      msgField.isVisible = true
+      orderMsgField.isVisible = true
    elseif ( phase == "did" ) then
       -- Called when the scene is now on screen.
       -- Insert code here to make the scene come alive.
@@ -319,7 +319,7 @@ function scene:hide( event )
       -- Insert code here to "pause" the scene.
       -- Example: stop timers, stop animation, stop audio, etc.
       -- Reset home scene
-      composer.removeScene("home")
+      --composer.removeScene("home")
    elseif ( phase == "did" ) then
       -- Called immediately after scene goes off screen.
       composer.setVariable("passScene", "")

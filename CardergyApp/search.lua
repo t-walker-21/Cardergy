@@ -19,7 +19,7 @@ local rowData = {}
 
 -- Function to shoow the search field
 function scene:showSearch()
-   searchField.isVisible = true
+   autoSearchField.isVisible = true
 end
  
 -- "scene:create()"
@@ -71,7 +71,7 @@ function scene:create( event )
    -- Function to hanle the menu button being pressed
    function menuEvent(event)
       -- Hide the search bar and remove the keyboard from the screen
-      searchField.isVisible = false
+      autoSearchField.isVisible = false
       native.setKeyboardFocus(nil)
 
       -- Show the menu overlay
@@ -102,7 +102,7 @@ function scene:create( event )
 
    -- Function to handle going to the QR scanner
    local function cameraEvent(event)
-      searchField.isVisible = false
+      autoSearchField.isVisible = false
       -- Go to the QR scanner
       composer.gotoScene("qrScanner")
    end
@@ -200,7 +200,7 @@ function scene:create( event )
          rowData = {}
 
          -- Send the searched text to the server
-         search = "search:"..searchField.text.."\n"
+         search = "search:"..autoSearchField.text.."\n"
          tcp:connect(host, port)
          tcp:send(search)
          local s, status, partial = tcp:receive()
@@ -239,7 +239,7 @@ function scene:create( event )
          end
 
          -- Check if search field is empty or null
-         if (searchField.text == nil or searchField.text == "") then
+         if (autoSearchField.text == nil or autoSearchField.text == "") then
             -- Reset the table view
             tableFlag = true
             display.remove(tableView)
@@ -254,13 +254,13 @@ function scene:create( event )
    end
 
    -- Create the search field
-   searchField = native.newTextField(0, 0, 300, 30)
-   searchField.inputType = "default"
-   searchField:setReturnKey("done")
-   searchField.placeholder = "Search for user..."
-   searchField:addEventListener("userInput", onSearch)
-   topbarContainer:insert(searchField)
-   searchField.y = 30
+   autoSearchField = native.newTextField(0, 0, 300, 30)
+   autoSearchField.inputType = "default"
+   autoSearchField:setReturnKey("done")
+   autoSearchField.placeholder = "Search for user..."
+   autoSearchField:addEventListener("userInput", onSearch)
+   topbarContainer:insert(autoSearchField)
+   autoSearchField.y = 30
   
    topbarContainer.y = 50
 
@@ -283,7 +283,7 @@ function scene:show( event )
  
    if ( phase == "will" ) then
       -- Called when the scene is still off screen (but is about to come on screen).
-      searchField.isVisible = true
+      autoSearchField.isVisible = true
    elseif ( phase == "did" ) then
       -- Called when the scene is now on screen.
       -- Insert code here to make the scene come alive.
