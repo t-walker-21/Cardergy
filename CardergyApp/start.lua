@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------------------
 --
--- main.lua
+-- start.lua
 --
 -----------------------------------------------------------------------------------------
 
@@ -115,12 +115,14 @@ function scene:create( event )
 	initialBall()
 	------------------PHYSICS SECTION----------------------------------------------------------
 
+	-- Display the Cardergy logo
 	local logo = display.newImageRect("logo_white.png", 300, 100)
 	logo.x = display.contentCenterX
 	logo.y = display.contentCenterY-100
 	logo:toFront()
 	sceneGroup:insert(logo)
 
+	-- Function to handle logging in
    	local function loginEvent(event)
    		local options = {
 			effect = "slideLeft",
@@ -129,7 +131,7 @@ function scene:create( event )
 		composer.gotoScene("login", options)
 	end
 
-	-- create settings button for changing the time setting - Alex Indihar
+	-- Create the login button
 	local loginBtn = widget.newButton(
 	{
 		label = "Sign In",
@@ -147,8 +149,12 @@ function scene:create( event )
 	loginBtn.y = display.contentCenterY + 40
 	sceneGroup:insert(loginBtn)
 
+	-- Function to handle registering
 	local function registerEvent(event)
+		-- Reset registration
 		composer.removeScene("register1")
+
+		-- Go to first registration scene
 		local options = {
 			effect = "slideLeft",
 			time = 800
@@ -156,6 +162,7 @@ function scene:create( event )
 		composer.gotoScene("register1", options)
 	end
 
+	-- Create the registration button
 	local registerBtn = widget.newButton(
 	{
 		label = "Register",
@@ -186,6 +193,7 @@ function scene:show( event )
       -- Called when the scene is now on screen.
       -- Insert code here to make the scene come alive.
       -- Example: start timers, begin animation, play audio, etc.
+      -- Reset the login/registration and menu overlay scenes
       composer.removeScene("register1")
       composer.removeScene("register2")
       composer.removeScene("profile")

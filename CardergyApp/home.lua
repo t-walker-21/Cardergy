@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------------------
+--
+-- home.lua
+--
+-----------------------------------------------------------------------------------------
+
 display.setStatusBar(display.DarkStatusBar)
 local composer = require( "composer" )
 local scene = composer.newScene()
@@ -8,7 +14,6 @@ local socket = require("socket")
 local tcp = assert(socket.tcp())
 local ftp = require("socket.ftp")
 local Card = require("card")
-tableFlag = false
 local parts = nil
 rowCnt = 0
 images = {}
@@ -18,10 +23,7 @@ tableView = nil
 Niall = nil
 searchField = nil
 
----------------------------------------------------------------------------------
--- All code outside of the listener functions will only be executed ONCE
--- unless "composer.removeScene()" is called.
----------------------------------------------------------------------------------
+-- String object function to split a string by a certian delimiter
 string.split = function(str, pattern)
   pattern = pattern or "[^%s]+"
   if pattern:len() == 0 then
@@ -35,8 +37,7 @@ string.split = function(str, pattern)
   return parts
 end
 
----------------------------------------------------------------------------------
-
+-- Function to show the search field
 function scene:showSearch()
    searchField.isVisible = true
 end
@@ -53,29 +54,29 @@ function scene:create( event )
   topbarContainer = display.newContainer(display.contentWidth, 100)
   topbarContainer:translate(display.contentWidth * 0.5, -5)
 
+  -- Format the top menu bar
   local paint = {
     type = "gradient",
     color1 = {248/255,181/255,0/255},
     color2 = {252/255,234/255,187/255},
     direction = "down"
   }
-
   topbarBackground = display.newRect(display.contentCenterX, display.contentCenterY, display.contentWidth, 100)
   topbarBackground.fill = paint
   topbarContainer:insert(topbarBackground, true)
 
-  -- Handle the menu button's touch events
+  -- Function to handle when the menu button is pressed
   function menuEvent(event)
-    -- hide the search bar because it's a pain
+    -- Hide the search bar and remove the keyboard
     searchField.isVisible = false
+    native.setKeyboardFocus(nil)
 
+    -- Show the menu overlay
     local options = {
       isModal = true,
       effect = "slideRight",
       time = 400
     }
-    
-    -- Show the overlay in all its glory
     composer.showOverlay("menu", options)
   end
 
@@ -87,7 +88,6 @@ function scene:create( event )
        --overFile = "menu_pressed.png",
        onRelease = menuEvent
   })
-
   topbarContainer:insert(menuBtn, true)
   menuBtn.x = -135
   menuBtn.y = -4
@@ -97,8 +97,9 @@ function scene:create( event )
   topbarInsignia.y = -10
   topbarContainer:insert(topbarInsignia)
 
-  -- Handle the camera button events
+  -- Function to handle pressing the camera button
   local function cameraEvent(event)
+    -- Go to the camera scene
     composer.gotoScene("qrScanner")
   end
 
@@ -110,12 +111,13 @@ function scene:create( event )
        --overFile = "camera_pressed.png",
        onRelease = cameraEvent
   })
-
   topbarContainer:insert(cameraBtn, true)
   cameraBtn.x = 135
   cameraBtn.y = -5
 
+  -- Function to handle the searching of cards from the database
   local function searchEvent()
+    -- Function to render table rows
     local function onRowRender( event )
       -- Get reference to the row group
       local row = event.row
@@ -124,71 +126,88 @@ function scene:create( event )
       local rowHeight = row.contentHeight
       local rowWidth = row.contentWidth
 
+      -- Isolate the category and name of each card
       local result = parts[row.index+1]:split("[^/]+")
       local category = result[1]
       local result2 = result[2]:split("[^%.]+")
       local name = result2[1]
       
+      -- Grab the card image from the database
       f,e = ftp.get("ftp://tjw0018:tevon@34.230.251.252/var/www/html/cards/"..category:gsub(" ", "%%20").."/"..result[2]:gsub(" ", "%%20")..";type=i") --login to ftp server and fetch file at given directory using binary mode (not ascii)
-      local path = system.pathForFile(result[2],system.TemporaryDirectory) --get system (lua) Documents directory
+
+      -- Store the card image in the system's temporary directory
+      local path = system.pathForFile(result[2],system.TemporaryDirectory)
+
       -- Open the file handle
       local file, errorString = io.open( path, "wb" ) -- open file for writing with path
       file:write(f) --write ftp data to file
       file:close() --close file
       
-
+      -- Display the card's name in the row
       local rowName = display.newText(row, "Name: "..name, 0, 0, native.systemFont, 14)
       rowName:setFillColor( 0 )
       rowName.anchorX = 0
       rowName.x = 90
       rowName.y = rowHeight * 0.35
 
+      -- Display the card's category in the row
       local rowCategory = display.newText(row, "Category: "..category, 0, 0, native.systemFont, 14)
       rowCategory:setFillColor( 0 )
       rowCategory.anchorX = 0
       rowCategory.x = 90
       rowCategory.y = rowHeight * 0.65
 
-      --Add row image to cells
+      -- Display the card's image in the row
       local rowImage = display.newImageRect(row, result[2], system.TemporaryDirectory, 50, 80)
       rowImage.x = 40
       rowImage.y = rowHeight/2
+
+      -- Store the card's info
       images[row.index] = result[2]
       categories[row.index] = category
       names[row.index] = name
     end
 
+    -- Function to handle pressing a row
     local function onRowTouch(event)
+      -- Check if the pressed row has been released
       if (event.phase == "release") then
         local row = event.row
 
+        -- Create card object, and set the card's category, back image, and name
         Niall = Card:new({})
         Niall:setCategory(categories[row.index])
         Niall:setBackImage(images[row.index])
         Niall:setName(names[row.index])
 
+        -- Store the card object as a composer global
         composer.setVariable("Niall", Niall)
+
+        -- Remove the keyboard
         native.setKeyboardFocus(nil)
 
+        -- Go to the item scene
         local options = {
            effect = "slideLeft",
            time = 800
         }
-
         composer.gotoScene("item", options)
       end
     end
 
+    -- Empty out the card info arrays
     images = {}
     categories = {}
     names = {}
 
+    -- Grab cards from database
     getCards = "getCards:"..searchField.text
     tcp:connect(host, port)
     tcp:send(getCards)
     local s, status, partial = tcp:receive()
     tcp:close()
 
+    -- Split the card info by delimiter
     if (s ~= nil and s ~= "") then
       parts = s:split("[^:]+")
       rowCnt = tonumber(parts[1])
@@ -197,8 +216,9 @@ function scene:create( event )
       rowCnt = tonumber(parts[1])
     end
 
+    -- Create a table
     tableView = widget.newTableView({
-      height = rowCnt * 90,
+      height = 470,
       width = 320,
       onRowRender = onRowRender,
       onRowTouch = onRowTouch,
@@ -208,6 +228,7 @@ function scene:create( event )
     tableView.x = display.contentCenterX
     tableView.y = display.contentCenterY-185
 
+    -- Insert rows by number of rows retrieved from database into the table
     if (rowCnt > 0) then
       for i = 1, rowCnt do
          -- Insert a row into the tableView
@@ -221,16 +242,19 @@ function scene:create( event )
     sceneGroup:insert(tableView)
   end
 
+  -- Function to handle the searching for certain cards
   local function onSearch(event)
     if ("began" == event.phase) then
+    -- Check if search entry has been submitted
     elseif ("submitted" == event.phase) then
+      -- Reset the table
       display.remove(tableView)
       searchEvent()
-      --native.setKeyboardFocus(nil)
+    -- Check if searching has ended
     elseif ("ended" == event.phase) then
+      -- Reset the table
       display.remove(tableView)
       searchEvent()
-      --native.setKeyboardFocus(nil)
     end
   end
 
@@ -244,15 +268,18 @@ function scene:create( event )
   searchField.x = 0
   searchField.y = 32
 
+  -- Default table search when first going to home scene
   searchEvent("")
 
   topbarContainer.y = 50
   sceneGroup:insert(topbarContainer)
 
+  -- Function to remove keyboard if runtime is pressed
   local function removeKeyboard()
       native.setKeyboardFocus(nil)
   end
 
+  -- Add event listener to remove the keyboard after runtime is pressed
   Runtime:addEventListener("tap",removeKeyboard)
 end
  
@@ -267,6 +294,8 @@ function scene:show( event )
     -- Called when the scene is now on screen.
     -- Insert code here to make the scene come alive.
     -- Example: start timers, begin animation, play audio, etc.
+
+    -- Reset all scenes related to the order
     composer.removeScene("item")
     composer.removeScene("search")
     composer.removeScene("message")

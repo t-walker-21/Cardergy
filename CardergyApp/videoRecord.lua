@@ -1,28 +1,13 @@
+-----------------------------------------------------------------------------------------
+--
+-- videoRecord.lua
+--
+-----------------------------------------------------------------------------------------
 
 local composer = require( "composer" )
 local scene = composer.newScene()
 local widget = require("widget")
 local crypto = require("crypto")
-
-
-
-
---f,e = ftp.put("ftp://tjw0018:".. password .."@34.240.251.252/var/www/html/videos/codeUpload/temp.jpg;type=i") --login to ftp server and fetch file at given directory using binary mode (not ascii)
-
---reading from file and sending to FTP server
-
-
-
-
- 
----------------------------------------------------------------------------------
--- All code outside of the listener functions will only be executed ONCE
--- unless "composer.removeScene()" is called.
----------------------------------------------------------------------------------
- 
--- local forward references should go here
- 
----------------------------------------------------------------------------------
  
 -- "scene:create()"
 function scene:create( event )
@@ -34,80 +19,63 @@ function scene:create( event )
 
    function takeVideo()
    --c6media.captureVideo({listener = confirmVideo, destination = {baseDir=system.DocumentsDirectory,filename=fname,type="image"}})
-
-
-    media.captureVideo( { listener=processVideo,preferredQuality="high",preferredMaxDuration=5} )
-
-
+      media.captureVideo( { listener=processVideo,preferredQuality="high",preferredMaxDuration=5} )
    end
-
 
    function onComplete()
-   takeVideo()
+      takeVideo()
    end
-
 
    function processVideo(event)
-   --ftp to server at file directory that processes qr codes
+      --ftp to server at file directory that processes qr codes
+      if (event.completed == false) then
+         prevScene = composer.getSceneName("previous")
+         composer.gotoScene(prevScene)
+         return
+      end
 
-   if (event.completed == false) then
-      prevScene = composer.getSceneName("previous")
-      composer.gotoScene(prevScene)
-      return
-   end
+      --local myText = display.newText( "fetching video", 100, 200, native.systemFont, 16 )
 
---local myText = display.newText( "fetching video", 100, 200, native.systemFont, 16 )
+      --local path = system.pathForFile(event.url,system.TemporaryDirectory) --get system (lua) Documents directory
 
---local path = system.pathForFile(event.url,system.TemporaryDirectory) --get system (lua) Documents directory
+      local sourcePath = string.sub(event.url,6,-1)
 
-   local sourcePath = string.sub(event.url,6,-1)
+      file, errorString = io.open(sourcePath,"r") -- open file for reading with path
+      
+      writePath = system.pathForFile("tempVid.mov", system.DocumentsDirectory)
+      fileWrite, errString = io.open(writePath,"w") -- open file for reading with path
 
-   
+      Niall = composer.getVariable("Niall")
+      Niall:setVideo("tempVid.mov")
+      composer.setVariable("Niall",Niall)
 
-   file, errorString = io.open(sourcePath,"r") -- open file for reading with path
-   
-   writePath = system.pathForFile("tempVid.mov", system.DocumentsDirectory)
-   fileWrite, errString = io.open(writePath,"w") -- open file for reading with path
+      --local myText = display.newText( errorString, 100, 200, native.systemFont, 16 )
 
-   Niall = composer.getVariable("Niall")
-   Niall:setVideo("tempVid.mov")
-   composer.setVariable("Niall",Niall)
+      local contents = file:read("*a") -- read contents of file into contents
 
---local myText = display.newText( errorString, 100, 200, native.systemFont, 16 )
+      file:close() --close file pointer--
+      fileWrite:write(contents)
+      fileWrite:close()
 
-
-local contents = file:read("*a") -- read contents of file into contents
-
-file:close() --close file pointer--
-fileWrite:write(contents)
-fileWrite:close()
-
---print ("the data was " .. s)--]]
-
-   
-   --prevScene = composer.getSceneName("previous")
-   composer.gotoScene("order")
-   --listen to socket to determine if image contained a qr code
-end
-  
-
-   
-
+      --print ("the data was " .. s)
+      
+      --prevScene = composer.getSceneName("previous")
+      composer.gotoScene("order")
+      --listen to socket to determine if image contained a qr code
+   end 
 end
  
 -- "scene:show()"
 function scene:show( event )
- 
+
    local sceneGroup = self.view
    local phase = event.phase
  
    if ( phase == "will" ) then
       -- Called when the scene is still off screen (but is about to come on screen).
    elseif ( phase == "did" ) then
-      
       onComplete()
    end
-
 end
  
 -- "scene:hide()"
@@ -144,6 +112,5 @@ scene:addEventListener( "hide", scene )
 scene:addEventListener( "destroy", scene )
  
 ---------------------------------------------------------------------------------
-
 
 return scene

@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------------------
+--
+-- message.lua
+--
+-----------------------------------------------------------------------------------------
+
 local socket = require("socket")
 local composer = require("composer")
 local scene = composer.newScene()
@@ -9,11 +15,13 @@ local sceneGroup = nil
 local validMsg = false
 local msgField = nil
 
+-- Function to handle reverting back to the field that triggered the error
 function scene:revertAlpha(field)
 	--sceneGroup.alpha = 1
 	native.setKeyboardFocus(field)
 end
 
+-- Function to show the message field
 function scene:showSearch()
 	msgField.isVisible = true
 end
@@ -25,31 +33,36 @@ function scene:create( event )
 
    	-- Initialize the scene here.
    	-- Example: add display objects to "sceneGroup", add touch listeners, etc.
+   	-- Create top bar menu
 	local topbarContainer = display.newContainer(display.contentWidth, 60)
    	topbarContainer:translate(display.contentWidth * 0.5, -5)
-
 	local paint = {
 		type = "gradient",
 		color1 = {248/255,181/255,0/255},
 		color2 = {252/255,234/255,187/255},
 		direction = "down"
 	}
-
 	local topbarBackground = display.newRect(display.contentCenterX, display.contentCenterY, display.contentWidth, 60)
 	topbarBackground.fill = paint
 	topbarContainer:insert(topbarBackground, true)
-
+   
+   -- Function to handle going back to the previous scene
    local function backIcnEvent(event)
+   		-- Remove the keyboard from the screen
+   		native.setKeyboardFocus(nil)
+
+   		-- Get the previous scene
    		local backScene = composer.getSceneName("previous")
 
+   		-- Go to the previous scene
 		local options = {
 			effect = "slideRight",
 			time = 800
 		}
-
 		composer.gotoScene(backScene, options)
    end
 
+   -- Create the back button
    backIcn = widget.newButton({
       width = 30,
       height = 30,
@@ -61,21 +74,24 @@ function scene:create( event )
    backIcn.x = -140
    backIcn.y = 10
 
+   	-- Function to handle the menu button being pressed
 	function menuEvent(event)
-		-- hide the search bar because it's a pain
+		-- Hide the message field 
 		msgField.isVisible = false
 
+		-- Remove the keyboard from the screen
+		native.setKeyboardFocus(nil)
+
+		-- Show the menu overlay
 		local options = {
 		  isModal = true,
 		  effect = "slideRight",
 		  time = 400
 		}
-
-		-- Show the overlay in all its glory
 		composer.showOverlay("menu", options)
 	end
 
-
+   -- Create the menu button
    menuBtn = widget.newButton({
          width = 30,
          height = 30,
@@ -92,10 +108,13 @@ function scene:create( event )
 
    topbarContainer:insert(topbarInsignia)
 
+   -- Function to handle pressing the camera button
    local function cameraEvent(event)
+   	-- Go to the QR scanner scene
    	composer.gotoScene("qrScanner")
    end
 
+   -- Create the camera button
    cameraBtn = widget.newButton({
          width = 30,
          height = 30,
@@ -111,9 +130,11 @@ function scene:create( event )
 
    sceneGroup:insert(topbarContainer)
 
+    -- Show the custom message title
    	recipientTxt = display.newText("Custom Message", display.contentCenterX, display.contentCenterY-180, native.systemFont, 32)
    	sceneGroup:insert(recipientTxt)
 
+   	-- Function to handle changing the error
 	local function changeError(f, t, s)
 		errOpts = {
 			isModal = true,
@@ -127,26 +148,28 @@ function scene:create( event )
 		}
 	end
 
+	-- Function to handle going to the recording video scene
 	local function recVidEvent(event)
-
+		-- Validate message input
 		if (string.len(msgField.text) > 1200) then
 			----sceneGroup.alpha = 0.5
 			changeError(msgField, "ERROR", "Message has gone over the 1200 character limit.")
 			composer.showOverlay("error", errOpts)
+		-- Check if valid input has been used
 		else
+			-- Store the message
 			msg = msgField.text
 			
-			--composer.setVariable("recipientMsg", msg)
+			-- Set the message on the global card object
 			Niall = composer.getVariable("Niall")
 			Niall:setMessage(msg)
 			composer.setVariable("Niall", Niall)
 			
-
+			-- Go to the video recording scene
 			local options = {
 				effect = "slideLeft",
 				time = 800
 			}
-
 			composer.gotoScene("videoRecord", options)
 		end
 
@@ -154,8 +177,11 @@ function scene:create( event )
 		--transition.moveTo(sceneGroup, {x=display.contentCenterX, y=display.contentCenterY-100})
 	end
 
+	-- Validate the user's input
 	local function validateInput()
 		display.remove(recVidBtn)
+
+		-- Check if message field is not empty
 		if (validMsg == true) then
 			recVidBtn = widget.newButton(
 			{
@@ -174,6 +200,7 @@ function scene:create( event )
 			recVidBtn.y = display.contentCenterY + 200
 			recVidBtn:setEnabled(true)
 			sceneGroup:insert(recVidBtn)
+		-- Check if message field is empty
 		else
 			recVidBtn = widget.newButton(
 			{
@@ -196,8 +223,7 @@ function scene:create( event )
 		end
 	end
 
-	
-
+	-- Function to handle editing the message
 	local function onMsg(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
@@ -224,6 +250,7 @@ function scene:create( event )
 		end
 	end
 
+	-- Create the message field
 	msgField = native.newTextBox(display.contentCenterX, display.contentCenterY, 300, 300)
 	msgField.inputType = "default"
 	--msgField:setReturnKey("done")
@@ -235,6 +262,7 @@ function scene:create( event )
 
 	sceneGroup:insert(msgField)
 
+	-- Create the video record button
 	recVidBtn = widget.newButton(
 	{
 		label = "Record Video",
@@ -254,10 +282,12 @@ function scene:create( event )
 	recVidBtn:setEnabled(true)
 	sceneGroup:insert(recVidBtn)
 
+	-- Function to handle removing the keyboard from the screen if runtime is pressed
 	local function removeKeyboard()
 		native.setKeyboardFocus(nil)
 	end
 
+	-- Add tap event listener for removing keyboard from screen after runtime is pressed
 	Runtime:addEventListener("tap", removeKeyboard)
 end
 
