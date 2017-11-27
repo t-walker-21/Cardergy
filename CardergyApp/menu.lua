@@ -39,12 +39,10 @@ function scene:create(event)
 		elseif (row.index == 2) then
 			rowTitle = display.newText(row, "     Account", 0, 0, native.systemFont, 15)
 		elseif (row.index == 3) then
-			rowTitle = display.newText(row, "     QR Camera", 0, 0, native.systemFont, 15)
-		elseif (row.index == 4) then
 			rowTitle = display.newText(row, "     Minigame", 0, 0, native.systemFont, 15)
-		elseif (row.index == 5) then
+		elseif (row.index == 4) then
 			rowTitle = display.newText(row, "     About Us", 0, 0, native.systemFont, 15)
-		elseif (row.index == 6) then
+		elseif (row.index == 5) then
 			rowTitle = display.newText(row, "     Logout", 0, 0, native.systemFont, 15)
 		end
 
@@ -75,14 +73,11 @@ function scene:create(event)
 				composer.gotoScene("profile", options)
 			elseif (row.index == 3) then
 				composer.hideOverlay(true, "slideLeft", 800)
-				composer.gotoScene("qrScanner", options)
+				composer.gotoScene("minigame", options)
 			elseif (row.index == 4) then
 				composer.hideOverlay(true, "slideLeft", 800)
-				composer.gotoScene("minigame", options)
-			elseif (row.index == 5) then
-				composer.hideOverlay(true, "slideLeft", 800)
 				composer.gotoScene("credits", options)
-			elseif (row.index == 6) then
+			elseif (row.index == 5) then
 				composer.hideOverlay(true, "slideLeft", 800)
 				composer.gotoScene("start", options)
 			end
@@ -104,7 +99,7 @@ function scene:create(event)
 	})
 
 	-- Insert rows into the table
-	for i = 1, 6 do
+	for i = 1, 5 do
 		-- Insert a row into the tableview
 		menulist:insertRow
 		{
