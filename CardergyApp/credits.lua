@@ -1,27 +1,15 @@
-display.setStatusBar(display.DarkStatusBar)
+-----------------------------------------------------------------------------------------
+--
+-- credits.lua
+--
+-----------------------------------------------------------------------------------------
+
 local composer = require( "composer" )
 local scene = composer.newScene()
 local widget = require("widget")
-local host, port = "34.230.251.252", 40000
-local socket = require("socket")
-local tcp = assert(socket.tcp())
-local crypto = require("crypto")
-
--------------------------Variables-----------------------------------------------
 local topbarContainer, topbarBackground, menuBtn, cameraBtn, topbarInsignia
- 
----------------------------------------------------------------------------------
--- All code outside of the listener functions will only be executed ONCE
--- unless "composer.removeScene()" is called.
----------------------------------------------------------------------------------
- 
--- local forward references should go here
- 
----------------------------------------------------------------------------------
-function scene:revertAlapha(field)
-   native.setKeyboardFocus(field)
-end
 
+-- Function to show search bar if there is one
 function scene:showSearch()
    return
 end
@@ -33,32 +21,33 @@ function scene:create( event )
  
    -- Initialize the scene here.
    -- Example: add display objects to "sceneGroup", add touch listeners, etc.
-   local user = composer.getVariable("user")
+   -- Create the topbar
    local topbarContainer = display.newContainer(display.contentWidth, 60)
-      topbarContainer:translate(display.contentWidth * 0.5, -5)
+   topbarContainer:translate(display.contentWidth * 0.5, -5)
 
+   -- Format the topbar
    local paint = {
       type = "gradient",
       color1 = {248/255,181/255,0/255},
       color2 = {252/255,234/255,187/255},
       direction = "down"
    }
-
    local topbarBackground = display.newRect(display.contentCenterX, display.contentCenterY, display.contentWidth, 60)
    topbarBackground.fill = paint
    topbarContainer:insert(topbarBackground, true)
 
+   -- Function to handle pressing the menu button
    local function menuEvent(event)
+      -- Show the menu overlay
       local options = {
         isModal = true,
         effect = "slideRight",
         time = 400
       }
-
-      -- Show the overlay in all its glory
       composer.showOverlay("menu", options)
    end
 
+   -- Create the menu button
    menuBtn = widget.newButton({
          width = 30,
          height = 30,
@@ -75,10 +64,13 @@ function scene:create( event )
 
    topbarContainer:insert(topbarInsignia)
 
+   -- Function to handle pressing the camera button
    local function cameraEvent(event)
+      -- Go to the camera scene
       composer.gotoScene("qrScanner")
    end
 
+   -- Create the camera button
    cameraBtn = widget.newButton({
          width = 30,
          height = 30,
@@ -94,6 +86,7 @@ function scene:create( event )
 
    sceneGroup:insert(topbarContainer)
 
+   ---------------------------------CREDITS SECTION--------------------------------------------------
    squadTxt = display.newText("The Card-Capos:", display.contentCenterX, display.contentCenterY-190, native.systemFont, 28)
 
    team = display.newImageRect("team.png", 250, 161)
@@ -126,6 +119,7 @@ function scene:create( event )
    }
    father = display.newCircle(display.contentCenterX, display.contentCenterY+180, 80)
    father.fill = paint
+   ---------------------------------CREDITS SECTION--------------------------------------------------
 
    sceneGroup:insert(squadTxt)
    sceneGroup:insert(team)

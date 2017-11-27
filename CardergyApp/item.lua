@@ -1,17 +1,14 @@
+-----------------------------------------------------------------------------------------
+--
+-- item.lua
+--
+-----------------------------------------------------------------------------------------
+
 local composer = require( "composer" )
 local scene = composer.newScene()
 local widget = require("widget")
 local topbarContainer, topbarBackground, menuBtn, cameraBtn, topbarInsignia
- 
----------------------------------------------------------------------------------
--- All code outside of the listener functions will only be executed ONCE
--- unless "composer.removeScene()" is called.
----------------------------------------------------------------------------------
- 
--- local forward references should go here
- 
----------------------------------------------------------------------------------
- 
+
 function scene:showSearch(event)
    return
 end
@@ -23,21 +20,22 @@ function scene:create( event )
  
    -- Initialize the scene here.
    -- Example: add display objects to "sceneGroup", add touch listeners, etc.
-   --local user = composer.getVariable("user")
+   -- Create the topbar menu
    local topbarContainer = display.newContainer(display.contentWidth, 60)
    topbarContainer:translate(display.contentWidth * 0.5, -5)
 
+   -- Format the topbar menu
    local paint = {
 		type = "gradient",
 		color1 = {248/255,181/255,0/255},
 		color2 = {252/255,234/255,187/255},
 		direction = "down"
 	}
-
    local topbarBackground = display.newRect(display.contentCenterX, display.contentCenterY, display.contentWidth, 60)
    topbarBackground.fill = paint
    topbarContainer:insert(topbarBackground, true)
 
+   -- Function to handle going back to the previous scene
    local function backIcnEvent(event)
       local options = {
          effect = "slideRight",
@@ -46,6 +44,7 @@ function scene:create( event )
       composer.gotoScene("home", options)
    end
 
+   -- Create the back button
    backIcn = widget.newButton({
       width = 30,
       height = 30,
@@ -57,17 +56,18 @@ function scene:create( event )
    backIcn.x = -140
    backIcn.y = 10
 
+   -- Function to handle pressing the menu button
    local function menuEvent(event)
+   	  -- Show the side menu overlay
       local options = {
         isModal = true,
         effect = "slideRight",
         time = 400
       }
-
-      -- Show the overlay in all its glory
       composer.showOverlay("menu", options)
    end
 
+   -- Create the menu button
    menuBtn = widget.newButton({
          width = 30,
          height = 30,
@@ -84,10 +84,13 @@ function scene:create( event )
 
    topbarContainer:insert(topbarInsignia)
 
+   -- Function to handle pressing the camera button
    local function cameraEvent(event)
+   	  -- Go to the camera scene
       composer.gotoScene("qrScanner")
    end
 
+   -- Create the camera button
    cameraBtn = widget.newButton({
          width = 30,
          height = 30,
@@ -103,7 +106,7 @@ function scene:create( event )
 
    sceneGroup:insert(topbarContainer)
 
-   ---------------retrieve card image here-------------------
+   -- Show enlarged versions of the selected card's image, name, and category
    Niall = composer.getVariable("Niall")
    genreTxt = display.newText("Genre: "..Niall.category, display.contentCenterX, display.contentCenterY-210, native.systemFont, 24)
    styleTxt = display.newText("Style: "..Niall.name, display.contentCenterX, display.contentCenterY-180, native.systemFont, 24)
@@ -114,28 +117,36 @@ function scene:create( event )
    card = display.newImageRect(Niall.backImage, system.TemporaryDirectory, 157, 250)
    card.x = display.contentCenterX
    card.y = display.contentCenterY - 20
+
    sceneGroup:insert(genreTxt)
    sceneGroup:insert(styleTxt)
    sceneGroup:insert(card)
-   ----------------------------------------------------------
 
+   -- Function to handle continuing with the order
    local function continueEvent(event)
+   	  -- Function to handle whether the user chooses to search for registered recipient or manually enter recipient info
       local function onComplete(event)
          local options = {
             effect = "slideLeft",
             time = 800
          }
          local i = event.index
+         -- Check if search is selected
          if (i == 1) then
+         	-- Go to auto search scene
             composer.gotoScene("search", options)
+         -- Check if manually is selected
          elseif (i == 2) then
+         	-- Go to manual entry scene
             composer.gotoScene("manually", options)
          end
       end
 
+      -- Alert user to choose search for registered recipient and manually enter recipient info
       local alert = native.showAlert("Search or Enter Manually", "Would you like to search for your recipient or enter his or her data in manually?", {"Search", "Manually"}, onComplete)
    end
 
+   -- Create continue button
    continueBtn = widget.newButton(
    {
       label = "Continue",
@@ -152,32 +163,6 @@ function scene:create( event )
    continueBtn.x = display.contentCenterX
    continueBtn.y = display.contentCenterY + 165
    sceneGroup:insert(continueBtn)
-
-   --[[
-   local function backBtnEvent(event)
-      local options = {
-         effect = "slideRight",
-         time = 800
-      }
-      composer.gotoScene("home", options)
-   end
-
-   backBtn = widget.newButton(
-   {
-      label = "Back",
-      fontSize = 20,
-      font = native.systemFontBold,
-      emboss = true,
-      onRelease = backBtnEvent,
-      shape = "roundedRect",
-      width = 220,
-      height = 60,
-      cornerRadius = 30,
-      fillColor = {default={1,1,1}, over={1,0,0.5}},
-   })
-   backBtn.x = display.contentCenterX
-   backBtn.y = display.contentCenterY + 210
-   sceneGroup:insert(backBtn)--]]
 end
  
 -- "scene:show()"
@@ -192,6 +177,7 @@ function scene:show( event )
       -- Called when the scene is now on screen.
       -- Insert code here to make the scene come alive.
       -- Example: start timers, begin animation, play audio, etc.
+      -- Clear the manual entry scene
       composer.removeScene("manually")
    end
 end

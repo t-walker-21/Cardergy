@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------------------
+--
+-- order.lua
+--
+-----------------------------------------------------------------------------------------
+
 local socket = require("socket")
 local composer = require("composer")
 local scene = composer.newScene()
@@ -21,11 +27,13 @@ state = "null"
 zip = "null"
 rUser = "null"
 
+-- Function to handle reverting to the field that triggered the error
 function scene:revertAlpha(field)
 	--sceneGroup.alpha = 1
 	native.setKeyboardFocus(field)
 end
 
+-- Function to show the message field
 function scene:showSearch()
 	msgField.isVisible = true
 end
@@ -38,31 +46,33 @@ function scene:create( event )
 
    	-- Initialize the scene here.
    	-- Example: add display objects to "sceneGroup", add touch listeners, etc.
+   	-- Create the top bar menu
 	local topbarContainer = display.newContainer(display.contentWidth, 60)
    	topbarContainer:translate(display.contentWidth * 0.5, -5)
-
 	local paint = {
 		type = "gradient",
 		color1 = {248/255,181/255,0/255},
 		color2 = {252/255,234/255,187/255},
 		direction = "down"
 	}
-
 	local topbarBackground = display.newRect(display.contentCenterX, display.contentCenterY, display.contentWidth, 60)
 	topbarBackground.fill = paint
 	topbarContainer:insert(topbarBackground, true)
 
+   -- Function to handle going back to the previous scene
    local function backIcnEvent(event)
+   		-- Get the previous scene
    		local backScene = composer.getSceneName("previous")
 
+   		-- Go to the previous scene
 		local options = {
 			effect = "slideRight",
 			time = 800
 		}
-
 		composer.gotoScene(backScene, options)
    end
 
+   -- Create the back button
    backIcn = widget.newButton({
       width = 30,
       height = 30,
@@ -74,20 +84,21 @@ function scene:create( event )
    backIcn.x = -140
    backIcn.y = 10
 
+   -- Function to handle the menu button being pressed
    function menuEvent(event)
-		-- hide the search bar because it's a pain
+		-- Hide the message field
 		msgField.isVisible = false
 
+		-- Show the side menu
 		local options = {
 		  isModal = true,
 		  effect = "slideRight",
 		  time = 400
 		}
-
-		-- Show the overlay in all its glory
 		composer.showOverlay("menu", options)
 	end
-
+   
+   -- Create the menu button
    menuBtn = widget.newButton({
          width = 30,
          height = 30,
@@ -104,10 +115,13 @@ function scene:create( event )
 
    topbarContainer:insert(topbarInsignia)
 
+   -- Function to handle going to the QR scanner
    local function cameraEvent(event)
+   	-- Go to te QR scanner
    	composer.gotoScene("qrScanner")
    end
 
+   -- Create the camera button
    cameraBtn = widget.newButton({
          width = 30,
          height = 30,
@@ -123,9 +137,11 @@ function scene:create( event )
 
    sceneGroup:insert(topbarContainer)
 
+    -- Show the order summary title
    	orderTxt = display.newText("Order Summary", display.contentCenterX, display.contentCenterY-180, native.systemFont, 32)
    	sceneGroup:insert(orderTxt)
 
+   	-- Function to change the error
 	local function changeError(f, t, s)
 		errOpts = {
 			isModal = true,
@@ -139,19 +155,20 @@ function scene:create( event )
 		}
 	end
 
+	-- Get message from card object
 	Niall = composer.getVariable("Niall")
+
+	-- Display the card object's design image
 	orderImg = display.newImageRect(Niall.backImage,system.TemporaryDirectory,107,170)
 	orderImg.x = display.contentCenterX - 70
 	orderImg.y = display.contentCenterY - 70
-	
 
-
+	-- Function to handle playing the card object's video
 	local function playVideo()
-		print("hello there playVideo")
 		media.playVideo(Niall.video,system.DocumentsDirectory,true)
 	end
 
-
+	-- Create the message field
 	msgField = native.newTextBox(display.contentCenterX, display.contentCenterY + 50, 250, 150)
 	msgField.y = display.contentCenterY + 105
 	msgField.inputType = "default"
@@ -161,14 +178,18 @@ function scene:create( event )
 	msgField.isFontSizeScaled = false
 	msgField.text = Niall.message
 	sceneGroup:insert(msgField)
+
+	-- Display the play button to play the card object's stored video
 	rect = display.newImage("playbutt.png",120,120)
 	rect.x = display.contentCenterX + 60
 	rect.y = display.contentCenterY - 90
+	-- Add event listener to play video after play button is pressed
 	rect:addEventListener("tap",playVideo)
 
+	-- Check if the recipient was searched in the database
 	if (composer.getVariable("recipientFlag") == "auto") then
 		recipient = display.newText("Recipient: "..composer.getVariable("recipientUser"),display.contentCenterX+65, display.contentCenterY-10, native.systemFont, 12)
-	
+	-- Check if the recipient was manually entered
 	else
 		recipient = display.newText("Recipient: "..composer.getVariable("recipientName"),display.contentCenterX+65, display.contentCenterY-10, native.systemFont, 12)
 	end
@@ -178,17 +199,20 @@ function scene:create( event )
 	sceneGroup:insert(orderImg)
 	sceneGroup:insert(orderTxt)
 	sceneGroup:insert(recipient)
-		
 
-	local function orderEvent(event) -- function to push card object to server and ftp video to user directory
-
+	-- Function to handle the order
+	local function orderEvent(event) 
+		-- Get the order type and sending user
 		orderType = composer.getVariable("recipientFlag")
 		sUser = composer.getVariable("user")
 
+		-- Check if the recipient was searched in the database
 		if (orderType == "auto") then
-			--
+			-- Get the recipient's username
 			rUser = composer.getVariable("recipientUser")
+		-- Check if the recipient was manually entered
 		else
+			-- Get the recipient's info
 			name = composer.getVariable("recipientName")
 			address = composer.getVariable("recipientAddress")
 			city = composer.getVariable("recipientCity")
@@ -197,7 +221,7 @@ function scene:create( event )
 			
 		end
 		
-
+		-- Store video in system's documens directory
 		local sourcePath = system.pathForFile("tempVid.mov", system.DocumentsDirectory)
 
    		file, errorString = io.open(sourcePath,"r") -- open file for reading with path
@@ -224,18 +248,21 @@ function scene:create( event )
 			time = 800
 		}
 
+		-- Function to go home on completion of the order
 		function onComplete()
+			-- Go to home scene
 			composer.gotoScene("home",options)
 		end
 
+		-- Show alert to notify sender that his or her order has been sent successfully
+
 		
 		audio.play(completionSound)
+
 		native.showAlert("SUCCESS","Your card was sent",{"OK"},onComplete)
-
-		
-
 	end
 
+	-- Create the order button
 	orderBtn = widget.newButton(
 	{
 		label = "Submit Order",
@@ -254,10 +281,12 @@ function scene:create( event )
 	orderBtn:setEnabled(true)
 	sceneGroup:insert(orderBtn)
 
+	-- Function to remove keyboard after runtime is pressed
 	local function removeKeyboard()
 		native.setKeyboardFocus(nil)
 	end
 
+	-- Add tap event listener for runtime for removing keyboard when runtime is pressed
 	Runtime:addEventListener("tap", removeKeyboard)
 end
 
@@ -287,6 +316,7 @@ function scene:hide( event )
       -- Called when the scene is on screen (but is about to go off screen).
       -- Insert code here to "pause" the scene.
       -- Example: stop timers, stop animation, stop audio, etc.
+      -- Reset home scene
       composer.removeScene("home")
    elseif ( phase == "did" ) then
       -- Called immediately after scene goes off screen.

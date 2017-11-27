@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------------------
+--
+-- manually.lua
+--
+-----------------------------------------------------------------------------------------
+
 local socket = require("socket")
 local composer = require("composer")
 local scene = composer.newScene()
@@ -11,11 +17,13 @@ local validName,validAddress,validCity,validState,validZip = false
 local nameField, addressField, cityField, stateField, zipField = nil
 local states = {"California", "Alabama", "Arkansas", "Arizona", "Alaska", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"};
 
+-- Function to handle reverting back to the field that triggered an error
 function scene:revertAlpha(field)
 	--sceneGroup.alpha = 1
 	native.setKeyboardFocus(field)
 end
 
+-- Function to show the search field if one exists
 function scene:showSearch(event)
    return
 end
@@ -26,23 +34,25 @@ function scene:create( event )
    	sceneGroup = self.view
    	local g = display.newGroup()
 
-   	-- Initialize the scene here.
-   	-- Example: add display objects to "sceneGroup", add touch listeners, etc.
-	local topbarContainer = display.newContainer(display.contentWidth, 60)
+   -- Initialize the scene here.
+   -- Example: add display objects to "sceneGroup", add touch listeners, etc.
+   -- Create the top bar menu
+   local topbarContainer = display.newContainer(display.contentWidth, 60)
    topbarContainer:translate(display.contentWidth * 0.5, -5)
-
    local paint = {
 		type = "gradient",
 		color1 = {248/255,181/255,0/255},
 		color2 = {252/255,234/255,187/255},
 		direction = "down"
 	}
-
    local topbarBackground = display.newRect(display.contentCenterX, display.contentCenterY, display.contentWidth, 60)
    topbarBackground.fill = paint
    topbarContainer:insert(topbarBackground, true)
 
+   -- Function to handle going back to the previous scene
    local function backIcnEvent(event)
+   	  native.setKeyboardFocus(nil)
+   	  -- Go to the item scene
       local options = {
          effect = "slideRight",
          time = 800
@@ -50,6 +60,7 @@ function scene:create( event )
       composer.gotoScene("item", options)
    end
 
+   -- Create the back button
    backIcn = widget.newButton({
       width = 30,
       height = 30,
@@ -61,17 +72,19 @@ function scene:create( event )
    backIcn.x = -140
    backIcn.y = 10
 
+   -- Function to handle pressing the menu button
    local function menuEvent(event)
+   	  native.setKeyboardFocus(nil)
+   	  -- Show the side menu overlay
       local options = {
         isModal = true,
         effect = "slideRight",
         time = 400
       }
-
-      -- Show the overlay in all its glory
       composer.showOverlay("menu", options)
    end
 
+   -- Create the menu button
    menuBtn = widget.newButton({
          width = 30,
          height = 30,
@@ -88,10 +101,13 @@ function scene:create( event )
 
    topbarContainer:insert(topbarInsignia)
 
+   -- Function to handle pressing the camera button
    local function cameraEvent(event)
+   	-- Go to the camera scene
    	composer.gotoScene("qrScanner")
    end
 
+   -- Create the camera button
    cameraBtn = widget.newButton({
          width = 30,
          height = 30,
@@ -107,9 +123,11 @@ function scene:create( event )
 
    sceneGroup:insert(topbarContainer)
 
+    -- Display recipient info title
    	recipientTxt = display.newText("Recipient Info", display.contentCenterX, display.contentCenterY-180, native.systemFont, 32)
    	sceneGroup:insert(recipientTxt)
 
+   	-- Function to handle changing the error
 	local function changeError(f, t, s)
 		errOpts = {
 			isModal = true,
@@ -123,7 +141,9 @@ function scene:create( event )
 		}
 	end
 
+	-- function to handle validating the recipient info
 	local function writeMsgEvent(event)
+		-- Verify state is valid
 		for i=1,50 do
 			if (states[i] == stateField.text) then
 				stateMatch = true
@@ -131,6 +151,7 @@ function scene:create( event )
 			end
 		end	
 
+		-- Check all fields using regex to make sure they are valid entries
 		if (not(string.match(nameField.text, "^[%u][%l]* [%u][%l]*$"))) then
 			----sceneGroup.alpha = 0.5
 			changeError(nameField, "ERROR", "Name must be entered as \"First Last\" without the quotes.")
@@ -175,13 +196,16 @@ function scene:create( event )
 			--sceneGroup.alpha = 0.5
 			changeError(zipField, "ERROR", "Zip code must be exactly 5 digits in length.")
 			composer.showOverlay("error", errOpts)
+		-- Check if all user input is valid
 		else
+			-- Store recipient data
 			name = nameField.text
 			address = addressField.text
 			city = cityField.text
 			state = stateField.text
 			zip = zipField.text
 			
+			-- Assign recipient data to composer globals
 			composer.setVariable("recipientName", name)
 			composer.setVariable("recipientAddress", address)
 			composer.setVariable("recipientCity", city)
@@ -189,11 +213,11 @@ function scene:create( event )
 			composer.setVariable("recipientZip", zip)
 			composer.setVariable("recipientFlag", "manual")
 
+			-- Go to message scene
 			local options = {
 				effect = "slideLeft",
 				time = 800
 			}
-
 			composer.gotoScene("message", options)
 		end
 
@@ -201,8 +225,12 @@ function scene:create( event )
 		--transition.moveTo(sceneGroup, {x=display.contentCenterX, y=display.contentCenterY-100})
 	end
 
+	-- Validate user input
 	local function validateInput()
+		-- Remove the message button
 		display.remove(writeMsgBtn)
+
+		-- Check if recipient info fields are not empty
 		if (validName == true and validAddress == true and validCity == true and validState == true and validZip == true) then
 			writeMsgBtn = widget.newButton(
 			{
@@ -221,6 +249,7 @@ function scene:create( event )
 			writeMsgBtn.y = display.contentCenterY + 115
 			writeMsgBtn:setEnabled(true)
 			sceneGroup:insert(writeMsgBtn)
+		-- Check if recipient info fields are empty
 		else
 			writeMsgBtn = widget.newButton(
 			{
@@ -243,6 +272,7 @@ function scene:create( event )
 		end
 	end
 
+	-- Function to handle editing the name field
 	local function onName(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
@@ -269,6 +299,7 @@ function scene:create( event )
 		end
 	end
 
+	-- Function to handle editing the address field
 	local function onAddress(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
@@ -295,6 +326,7 @@ function scene:create( event )
 		end
 	end
 
+	-- Function to handle editing the city field
 	local function onCity(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
@@ -321,6 +353,7 @@ function scene:create( event )
 		end
 	end
 
+	-- Function to handle editing the state field
 	local function onState(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
@@ -347,6 +380,7 @@ function scene:create( event )
 		end
 	end
 
+	-- Function to handle editing the zip code field
 	local function onZip(event)
 		if ("began" == event.phase) then
 		elseif ("editing" == event.phase) then
@@ -373,30 +407,35 @@ function scene:create( event )
 		end
 	end
 
+	-- Create the name field
 	nameField = native.newTextField(display.contentCenterX, display.contentCenterY-130, 240, 30)
 	nameField.inputType = "default"
 	nameField:setReturnKey("done")
 	nameField.placeholder = "Name: First Last"
 	nameField:addEventListener("userInput", onName)
 
+	-- Creeate the address field
 	addressField = native.newTextField(display.contentCenterX, display.contentCenterY-90, 240, 30)
 	addressField.inputType = "default"
 	addressField:setReturnKey("done")
 	addressField.placeholder = "Street Address"
 	addressField:addEventListener("userInput", onAddress)
 
+	-- Create the city field
 	cityField = native.newTextField(display.contentCenterX, display.contentCenterY-50, 240, 30)
 	cityField.inputType = "default"
 	cityField:setReturnKey("done")
 	cityField.placeholder = "City"
 	cityField:addEventListener("userInput", onCity)
 
+	-- Create the state field
 	stateField = native.newTextField(display.contentCenterX, display.contentCenterY-10, 240, 30)
 	stateField.inputType = "default"
 	stateField:setReturnKey("done")
 	stateField.placeholder = "State"
 	stateField:addEventListener("userInput", onState)
 
+	-- Create the zip coe field
 	zipField = native.newTextField(display.contentCenterX, display.contentCenterY+30, 240, 30)
 	zipField.inputType = "default"
 	zipField:setReturnKey("done")
@@ -409,6 +448,7 @@ function scene:create( event )
 	sceneGroup:insert(stateField)
 	sceneGroup:insert(zipField)
 
+	-- Create the message button
 	writeMsgBtn = widget.newButton(
 	{
 		label = "Write Message",
@@ -428,10 +468,12 @@ function scene:create( event )
 	writeMsgBtn:setEnabled(true)
 	sceneGroup:insert(writeMsgBtn)
 
+	-- Function to handle removing the keyboard from runtime when it is pressed
 	local function removeKeyboard()
 		native.setKeyboardFocus(nil)
 	end
 
+	-- Add event listender for removing keyboard from runtime after it is pressed
 	Runtime:addEventListener("tap", removeKeyboard)
 end
 

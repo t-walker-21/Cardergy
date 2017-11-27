@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------------------
+--
+-- profile.lua
+--
+-----------------------------------------------------------------------------------------
+
 display.setStatusBar(display.DarkStatusBar)
 local composer = require( "composer" )
 local scene = composer.newScene()
@@ -6,8 +12,6 @@ local host, port = "34.230.251.252", 40000
 local socket = require("socket")
 local tcp = assert(socket.tcp())
 local crypto = require("crypto")
-
--------------------------Variables-----------------------------------------------
 local topbarContainer, topbarBackground, menuBtn, cameraBtn, topbarInsignia
 local i
 local rowTitle = nil
@@ -17,18 +21,12 @@ local parts
 local errorOpts = nil
 local uname, pass, email, phone, name, street, city, state, zip
  
----------------------------------------------------------------------------------
--- All code outside of the listener functions will only be executed ONCE
--- unless "composer.removeScene()" is called.
----------------------------------------------------------------------------------
- 
--- local forward references should go here
- 
----------------------------------------------------------------------------------
+-- Function to handle reverting to the field that triggered the error
 function scene:revertAlapha(field)
    native.setKeyboardFocus(field)
 end
 
+-- Function to show the search field if there is one
 function scene:showSearch()
    return
 end
@@ -40,32 +38,34 @@ function scene:create( event )
  
    -- Initialize the scene here.
    -- Example: add display objects to "sceneGroup", add touch listeners, etc.
+   -- Get the logged in user's username
    local user = composer.getVariable("user")
-   local topbarContainer = display.newContainer(display.contentWidth, 60)
-      topbarContainer:translate(display.contentWidth * 0.5, -5)
 
+   -- Create the top bar menu
+   local topbarContainer = display.newContainer(display.contentWidth, 60)
+   topbarContainer:translate(display.contentWidth * 0.5, -5)
    local paint = {
       type = "gradient",
       color1 = {248/255,181/255,0/255},
       color2 = {252/255,234/255,187/255},
       direction = "down"
    }
-
    local topbarBackground = display.newRect(display.contentCenterX, display.contentCenterY, display.contentWidth, 60)
    topbarBackground.fill = paint
    topbarContainer:insert(topbarBackground, true)
 
+   -- Function to handle pressing the menu button
    local function menuEvent(event)
+      -- Show the side menu overlay
       local options = {
         isModal = true,
         effect = "slideRight",
         time = 400
       }
-
-      -- Show the overlay in all its glory
       composer.showOverlay("menu", options)
    end
 
+   -- Create the menu button
    menuBtn = widget.newButton({
          width = 30,
          height = 30,
@@ -82,10 +82,13 @@ function scene:create( event )
 
    topbarContainer:insert(topbarInsignia)
 
+   -- Function to go to the QR camera
    local function cameraEvent(event)
+      -- Go to the QR scanner
       composer.gotoScene("qrScanner")
    end
 
+   -- Create a camera button
    cameraBtn = widget.newButton({
          width = 30,
          height = 30,
@@ -99,9 +102,11 @@ function scene:create( event )
 
    topbarContainer.y = 30
 
+   -- Function to change profile image
    local function profileEvent(event)
    end
 
+   -- Create profile button
    profileBtn = widget.newButton({
       width = 150,
       height = 150,
@@ -112,6 +117,7 @@ function scene:create( event )
    profileBtn.x = display.contentCenterX
    profileBtn.y = display.contentCenterY-135
 
+   -- Function to set table properties for each row
    local function rowProperties(index, title, height, width)
       if (index == 1) then
          --title.anchorX = 0
@@ -124,6 +130,7 @@ function scene:create( event )
       end
    end
 
+   -- Function to change the error
    local function changeError(f, t, s)
       errOpts = {
          isModal = true,
@@ -152,12 +159,14 @@ function scene:create( event )
    end
    ------------OOP-----------------------
 
+   -- Get the logged in user's profile from the database
    getProfile = "getProfile:"..user
    tcp:connect(host, port)
    tcp:send(getProfile)
    local s, status, partial = tcp:receive()
    tcp:close()
 
+   -- Parse out the profile's fields of information
    if (s ~= nil and s ~= "") then
       parts = s:split("[^:]+")
       uname = parts[1]
@@ -180,18 +189,20 @@ function scene:create( event )
       city = parts[7]
       state = parts[8]
       zip = parts[9]
+   -- Check if error extracting data occurred
    else
       changeError(nil, "ERROR", "Database problem. Try again later.")
       composer.showOverlay("error", errOpts)
    end
 
-   -- The "onRowRender" function may go here (see example under "Inserting Rows", above)
+   -- Function to render table rows
    local function onRowRender(event)
       local row = event.row
 
       local rowHeight = row.contentHeight
       local rowWidth = row.contentWidth
 
+      -- Display each part of user's information per row
       if (row.index == 1) then
          rowTitle = display.newText(row, name, 0, 0, native.systemFont, 28)
       elseif (row.index == 2) then
@@ -212,11 +223,12 @@ function scene:create( event )
          rowTitle = display.newText(row, "Zip: "..zip, 0, 0, native.systemFont, 14)
       end
 
+      -- Set row text properities
       rowTitle:setFillColor(0,0,0)
       rowProperties(row.index, rowTitle, rowHeight, rowWidth)
    end
  
-   -- Create the widget
+   -- Create the table
    local tableView = widget.newTableView({
       height = 330,
       width = 320,
@@ -228,7 +240,7 @@ function scene:create( event )
    tableView.x = display.contentCenterX
    tableView.y = display.contentCenterY+120
     
-   -- Insert 40 rows
+   -- Insert table rows
    for i = 1, 10 do
       -- Insert a row into the tableView
       tableView:insertRow({
