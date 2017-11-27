@@ -218,7 +218,7 @@ function scene:create( event )
 
     -- Create a table
     tableView = widget.newTableView({
-      height = rowCnt * 90,
+      height = 470,
       width = 320,
       onRowRender = onRowRender,
       onRowTouch = onRowTouch,
