@@ -16,8 +16,19 @@ myText = nil
 
 --reading from file and sending to FTP server
 
+function goBack()
+   prevScene = composer.getSceneName("previous")
+   composer.removeScene("qrScanner")
+   composer.gotoScene(prevScene)
+end
 
 
+function playDownloadedVideo()
+
+media.playVideo("downloadedFile.mov",system.DocumentsDirectory,true) -- play video from documents directory
+
+return
+end
 
  
 ---------------------------------------------------------------------------------
@@ -37,8 +48,48 @@ function scene:create( event )
    -- Initialize the scene here.
    -- Example: add display objects to "sceneGroup", add touch listeners, etc.
   
+   takePhoto()
 
+   playAgainBtn = widget.newButton(
+         {
+            label = "Play Again",
+            fontSize = 20,
+            font = native.systemFontBold,
+            emboss = true,
+            onRelease = playDownloadedVideo,
+            shape = "roundedRect",
+            width = 220,
+            height = 60,
+            cornerRadius = 30,
+            fillColor = {default={1,1,1}, over={1,0,0.5}}
+         })
+
+         playAgainBtn.x = display.contentCenterX
+         playAgainBtn.y = display.contentCenterY + 60
+         sceneGroup:insert(playAgainBtn)
+
+
+          backBtn = widget.newButton(
+         {
+            label = "Go Back",
+            fontSize = 20,
+            font = native.systemFontBold,
+            emboss = true,
+            onRelease = goBack,
+            shape = "roundedRect",
+            width = 220,
+            height = 60,
+            cornerRadius = 30,
+            fillColor = {default={1,1,1}, over={1,0,0.5}}
+         })
+
+         backBtn.x = display.contentCenterX
+         backBtn.y = display.contentCenterY + 130
+         sceneGroup:insert(backBtn)
    
+         backBtn.isVisible = false
+         playAgainBtn.isVisible = false
+
 
 end
  
@@ -52,7 +103,7 @@ function scene:show( event )
       -- Called when the scene is still off screen (but is about to come on screen).
    elseif ( phase == "did" ) then
       
-      takePhoto()
+      
    end
 
 end
@@ -169,12 +220,17 @@ file:write(f) --write ftp data to file
 
 
 file:close() --close file
+file = nil
+
+playDownloadedVideo()
+backBtn.isVisible = true
+playAgainBtn.isVisible = true
 
 
-media.playVideo("downloadedFile.mov",system.DocumentsDirectory,true) -- play video from documents directory
 
-prevScene = composer.getSceneName("previous")
-composer.gotoScene(prevScene)
+         
+
+
 
 end
 
